@@ -1,8 +1,8 @@
 package com.lexorahome.Lexora.main.service;
 
+import com.lexorahome.Lexora.main.entity.DataSourceFactory;
 import com.lexorahome.Lexora.main.entity.PriceList;
-import com.lexorahome.Lexora.main.entity.PriceListFactory;
-import com.lexorahome.Lexora.main.entity.PriceListSource;
+import com.lexorahome.Lexora.main.entity.DataSource;
 import com.lexorahome.Lexora.main.repository.PriceListRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,9 +34,9 @@ public class PriceListService {
                 continue;
             }
 
-            PriceListFactory priceListFactory = new PriceListFactory(goodService,retailService,parserService);
-            PriceListSource priceListSource = priceListFactory.getSource("sheet");
-            priceListSource.parse("lowes.com",row,priceList);
+            DataSourceFactory dataSourceFactory = new DataSourceFactory(goodService,retailService,parserService);
+            DataSource dataSource = dataSourceFactory.getSource("sheet");
+            dataSource.parse("lowes.com",row,priceList);
         }
 
         return priceList;

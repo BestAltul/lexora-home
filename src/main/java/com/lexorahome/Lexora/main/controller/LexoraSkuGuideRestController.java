@@ -24,7 +24,7 @@ public class LexoraSkuGuideRestController {
             return ResponseEntity.badRequest().body("File is not found");
         }
 
-        boolean loaded = lexoraSkuGuideService.uploadFiles(file,"Lowes",25);
+        boolean loaded = lexoraSkuGuideService.uploadFiles(file,81);
 
         return ResponseEntity.ok("");
     }

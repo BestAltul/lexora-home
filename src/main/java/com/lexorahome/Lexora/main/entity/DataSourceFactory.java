@@ -4,21 +4,19 @@ import com.lexorahome.Lexora.main.service.GoodService;
 import com.lexorahome.Lexora.main.service.ParserService;
 import com.lexorahome.Lexora.main.service.RetailService;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.core.ApplicationContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class PriceListFactory {
+public class DataSourceFactory {
     private final GoodService goodService;
     private final RetailService retailService;
     private final ParserService parserService;
 
-    public PriceListSource getSource(String retail){
+    public DataSource getSource(String retail){
         switch(retail.toLowerCase()){
             case "sheet":
-                return new SheetPriceList(goodService,retailService,parserService);
+                return new SheetSourceList(goodService,retailService,parserService);
             case "odoo":
         //        return new OdooPriceList();
             default:

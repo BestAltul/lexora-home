@@ -1,11 +1,11 @@
 package com.lexorahome.Lexora.main.service;
 
 import com.lexorahome.Lexora.main.entity.*;
+import com.lexorahome.Lexora.main.exception.CoreSkuIsEmptyException;
 import com.lexorahome.Lexora.main.repository.GoodRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -31,11 +31,20 @@ public class GoodService {
     // 8 UPC
     // 9 Core_SKU
     // 10 isCore
+    public Good createGood(List<String> row) {
+        final int IDX_SKU = 0;
+        final int IDX_OLD_SKU = 1;
+        final int IDX_TITLE = 2;
+        final int IDX_COLLECTION = 3;
+        final int IDX_CATEGORY = 4;
+        final int IDX_COLOR = 5;
+        final int IDX_PRODUCT_TYPE = 6;
+        final int IDX_KIT_SINGLE = 7;
+        final int IDX_UPC = 8;
+        final int IDX_CORE_SKU = 9;
+        final int IDX_IS_CORE = 10;
 
-    public Good createGood(List<String> row){
-
-        String skuValue = row.get(0).trim();
-
+        String skuValue = safeGet(row, IDX_SKU);
         if (skuValue.isEmpty()) {
             throw new IllegalArgumentException("SKU cannot be empty");
         }
@@ -47,47 +56,172 @@ public class GoodService {
 
         Good good = new Good();
         good.setSku(skuValue);
+        good.setTitle(safeGet(row, IDX_TITLE));
 
-        //good.setOldSku(1);
-
-        good.setTitle(row.get(2));
-        good.setCore(true);
-
-//        CollectionLexora collectionLexora;
-//
-//        try {
-//            collectionLexora = CollectionLexora.valueOf(row.get(3).toUpperCase());
-//        } catch (IllegalArgumentException e) {
-//            collectionLexora = CollectionLexora.NOT_FOUND;
-//        }
-//
-//        if(collectionLexora!=null){
-//            good.setCollectionLexora(collectionLexora);
-//        }
-
-        GoodsCollection goodsCollection = goodsCollectionService.getOrCreateGoodsCollection(row.get(3));
-        good.setGoodsCollection(goodsCollection);
-
-        Category category = categoryService.getOrCreateCategory(row.get(4));
-        good.setCategory(category);
-
-        String upcRaw = row.get(5);
-
-        try {
-            String upcString = new BigDecimal(row.get(5)).toPlainString();
-            good.setUpc(upcString);
-        } catch (NumberFormatException e) {
-            good.setUpc(null);
+        String oldSku = safeGet(row, IDX_OLD_SKU);
+        if (!oldSku.isEmpty()) {
+            good.setOldSku(oldSku);
         }
 
-//        Color color = colorService.getOrCreateColor(row.get(5));
-//        good.setColor(color);
-//
-//        ProductType productType = productTypeService.getOrCreateProductType(row.get(6));
-//        good.setProductType(productType);
-//
-//        good.setKitOrSingle(KitOrSingle.fromString(row.get(7)));
+        String isCoreValue = safeGet(row, IDX_IS_CORE);
+        if (isCoreValue.equals("true")){
+            good.setCore(true);
+        }else{
+            good.setCore(false);
+            String coreSku = safeGet(row,IDX_CORE_SKU);
+            if (coreSku.isEmpty()){
+                throw new CoreSkuIsEmptyException("coreSku is empty for non-core item "+skuValue);
+            }
+        }
 
-        return goodRepository.save(good);
+        String collectionName = safeGet(row, IDX_COLLECTION);
+        if (!collectionName.isEmpty()) {
+            GoodsCollection goodsCollection = goodsCollectionService.getOrCreateGoodsCollection(collectionName);
+            good.setGoodsCollection(goodsCollection);
+        }
+
+
+        String categoryName = safeGet(row, IDX_CATEGORY);
+        if (!categoryName.isEmpty()) {
+            Category category = categoryService.getOrCreateCategory(categoryName);
+            good.setCategory(category);
+        }
+
+
+        String colorName = safeGet(row, IDX_COLOR);
+        if (!colorName.isEmpty()) {
+            Color color = colorService.getOrCreateColor(colorName);
+            good.setColor(color);
+        }
+
+
+        String productTypeName = safeGet(row, IDX_PRODUCT_TYPE);
+        if (!productTypeName.isEmpty()) {
+            ProductType productType = productTypeService.getOrCreateProductType(productTypeName);
+            good.setProductType(productType);
+        }
+
+        String kitOrSingleTextValue = safeGet(row, IDX_KIT_SINGLE);
+        if (!productTypeName.isEmpty()) {
+            KitOrSingle kitOrSingle = KitOrSingle.fromString(kitOrSingleTextValue);
+            good.setKitOrSingle(kitOrSingle);
+        }
+
+        String upcRaw = safeGet(row, IDX_UPC);
+        if (!upcRaw.isEmpty()) {
+            try {
+                String upcString = new BigDecimal(upcRaw).toPlainString();
+                good.setUpc(upcString);
+            } catch (NumberFormatException e) {
+                good.setUpc(null);
+            }
+        }
+
+        try{
+            return goodRepository.save(good);
+        }catch (Exception e){
+            throw new RuntimeException("Error in saving the item "+skuValue);
+        }
+    }
+
+    public Good createNotCoreGood(List<String> row) {
+        final int IDX_SKU = 0;
+        final int IDX_OLD_SKU = 1;
+        final int IDX_TITLE = 2;
+        final int IDX_COLLECTION = 3;
+        final int IDX_CATEGORY = 4;
+        final int IDX_COLOR = 5;
+        final int IDX_PRODUCT_TYPE = 6;
+        final int IDX_KIT_SINGLE = 7;
+        final int IDX_UPC = 8;
+        final int IDX_CORE_SKU = 9;
+        final int IDX_IS_CORE = 10;
+
+        String skuValue = safeGet(row, IDX_SKU);
+        if (skuValue.isEmpty()) {
+            throw new IllegalArgumentException("SKU cannot be empty");
+        }
+
+        Optional<Good> existing = goodRepository.findBySku(skuValue);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+
+        Good good = new Good();
+        good.setSku(skuValue);
+        good.setTitle(safeGet(row, IDX_TITLE));
+
+        String oldSku = safeGet(row, IDX_OLD_SKU);
+        if (!oldSku.isEmpty()) {
+            good.setOldSku(oldSku);
+        }
+
+        String isCoreValue = safeGet(row, IDX_IS_CORE);
+        if (isCoreValue.equals("true")){
+            good.setCore(true);
+        }else{
+            good.setCore(false);
+            String coreSku = safeGet(row,IDX_CORE_SKU);
+            if (coreSku.isEmpty()){
+                throw new CoreSkuIsEmptyException("coreSku is empty for non-core item "+skuValue);
+            }
+        }
+
+        String collectionName = safeGet(row, IDX_COLLECTION);
+        if (!collectionName.isEmpty()) {
+            GoodsCollection goodsCollection = goodsCollectionService.getOrCreateGoodsCollection(collectionName);
+            good.setGoodsCollection(goodsCollection);
+        }
+
+
+        String categoryName = safeGet(row, IDX_CATEGORY);
+        if (!categoryName.isEmpty()) {
+            Category category = categoryService.getOrCreateCategory(categoryName);
+            good.setCategory(category);
+        }
+
+
+        String colorName = safeGet(row, IDX_COLOR);
+        if (!colorName.isEmpty()) {
+            Color color = colorService.getOrCreateColor(colorName);
+            good.setColor(color);
+        }
+
+
+        String productTypeName = safeGet(row, IDX_PRODUCT_TYPE);
+        if (!productTypeName.isEmpty()) {
+            ProductType productType = productTypeService.getOrCreateProductType(productTypeName);
+            good.setProductType(productType);
+        }
+
+        String kitOrSingleTextValue = safeGet(row, IDX_KIT_SINGLE);
+        if (!productTypeName.isEmpty()) {
+            KitOrSingle kitOrSingle = KitOrSingle.fromString(kitOrSingleTextValue);
+            good.setKitOrSingle(kitOrSingle);
+        }
+
+        String upcRaw = safeGet(row, IDX_UPC);
+        if (!upcRaw.isEmpty()) {
+            try {
+                String upcString = new BigDecimal(upcRaw).toPlainString();
+                good.setUpc(upcString);
+            } catch (NumberFormatException e) {
+                good.setUpc(null);
+            }
+        }
+
+        try{
+            return goodRepository.save(good);
+        }catch (Exception e){
+            throw new RuntimeException("Error in saving the item "+skuValue);
+        }
+    }
+
+    private String safeGet(List<String> row, int index) {
+        if (row == null || index >= row.size()) {
+            return "";
+        }
+        String value = row.get(index);
+        return value == null ? "" : value.trim();
     }
 }

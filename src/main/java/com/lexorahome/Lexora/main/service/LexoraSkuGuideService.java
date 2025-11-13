@@ -1,8 +1,8 @@
 package com.lexorahome.Lexora.main.service;
 
-import com.lexorahome.Lexora.main.entity.PriceList;
-import com.lexorahome.Lexora.main.entity.PriceListFactory;
-import com.lexorahome.Lexora.main.entity.PriceListSource;
+import com.lexorahome.Lexora.main.entity.DataSourceFactory;
+import com.lexorahome.Lexora.main.entity.DataSource;
+import com.lexorahome.Lexora.main.entity.Good;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.stereotype.Service;
@@ -31,21 +31,27 @@ public class LexoraSkuGuideService {
                 continue;
             }
 
-            PriceListFactory priceListFactory = new PriceListFactory(goodService,retailService,parserService);
-            PriceListSource priceListSource = priceListFactory.getSource("sheet");
-            priceListSource.parseLexoraSkuGuide(row);
+            DataSourceFactory dataSourceFactoryFactory = new DataSourceFactory(goodService,retailService,parserService);
+            DataSource sheetSource = dataSourceFactoryFactory.getSource("sheet");
+
+            //1. parse Lexora core data
+            List<String> mappedLines = sheetSource.parseLexoraSkuGuide(row);
+            Good good = goodService.createGood(mappedLines);
+
+            //2. Based on the template create related SKUs (white label, BM+SKUs)
+            //sheetSource.parseLexoraSkuGuideNotCore(row);
+
         }
 
         return true;
     }
 
-    public boolean uploadFiles(MultipartFile file, String sheetName, int maxColumns) throws IOException {
+    public boolean uploadFiles(MultipartFile file, int maxColumns) throws IOException {
 
         List<List<String>> data = new ArrayList<>();
 
         try(Workbook workbook = WorkbookFactory.create(file.getInputStream())){
-            // try to think how to adapt this to all price lists
-            //Sheet sheet =  workbook.getSheet(sheetName.trim());
+
             Sheet sheet =  workbook.getSheetAt(0);
 
             if(sheet == null){
@@ -59,6 +65,7 @@ public class LexoraSkuGuideService {
                 for(int i = 0;i<maxColumns;i++){
                     rowData.add(cellToString(row.getCell(i)));
                 }
+
                 data.add(rowData);
             }
         }

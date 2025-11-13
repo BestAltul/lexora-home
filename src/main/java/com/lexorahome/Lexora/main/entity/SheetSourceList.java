@@ -4,10 +4,8 @@ import com.lexorahome.Lexora.main.service.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +13,7 @@ import java.util.List;
 @Setter
 @RequiredArgsConstructor
 @Component
-public class SheetPriceList implements PriceListSource{
+public class SheetSourceList implements DataSource {
     private final GoodService goodService;
     private final RetailService retailService;
     private final ParserService parserService;
@@ -49,13 +47,9 @@ public class SheetPriceList implements PriceListSource{
 
     }
 
-    public void parseLexoraSkuGuide(List<String> row){
+    public List<String> parseLexoraSkuGuide(List<String> row){
 
-        List<String> mappedLines = new ArrayList<>();
-
-        mappedLines = parserService.parseLexoraSkuGuide(row);
-
-        Good good = goodService.createGood(mappedLines);
-
+        List<String> mappedLines = parserService.parseLexoraSkuGuide(row);
+        return mappedLines;
     }
 }
