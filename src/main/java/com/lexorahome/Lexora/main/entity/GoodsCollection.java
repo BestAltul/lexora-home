@@ -19,7 +19,7 @@ public class GoodsCollection {
 
     private String name;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private Brand brand;
 
     @ManyToOne(fetch = FetchType.LAZY)

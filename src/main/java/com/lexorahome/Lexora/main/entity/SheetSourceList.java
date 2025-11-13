@@ -52,4 +52,12 @@ public class SheetSourceList implements DataSource {
         List<String> mappedLines = parserService.parseLexoraSkuGuide(row);
         return mappedLines;
     }
+
+    @Override
+    public List<String> parseLexoraSkuNotCoreGuide(List<String> row) {
+
+        List<String> mappedLines = parserService.parseLexoraNotCoreSkuGuide(row);
+        return mappedLines;
+    }
+
 }

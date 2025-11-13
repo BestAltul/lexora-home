@@ -39,7 +39,8 @@ public class LexoraSkuGuideService {
             Good good = goodService.createGood(mappedLines);
 
             //2. Based on the template create related SKUs (white label, BM+SKUs)
-            //sheetSource.parseLexoraSkuGuideNotCore(row);
+            List<String> mappedLinesNotCore = sheetSource.parseLexoraSkuNotCoreGuide(row);
+            Good goodNotCore = goodService.createNotCoreGood(mappedLinesNotCore);
 
         }
 

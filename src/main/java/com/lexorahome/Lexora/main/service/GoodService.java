@@ -134,8 +134,9 @@ public class GoodService {
         final int IDX_PRODUCT_TYPE = 6;
         final int IDX_KIT_SINGLE = 7;
         final int IDX_UPC = 8;
-        final int IDX_CORE_SKU = 9;
+        final int IDX_CORE_SKU = 11;
         final int IDX_IS_CORE = 10;
+
 
         String skuValue = safeGet(row, IDX_SKU);
         if (skuValue.isEmpty()) {
@@ -162,6 +163,13 @@ public class GoodService {
         }else{
             good.setCore(false);
             String coreSku = safeGet(row,IDX_CORE_SKU);
+
+            Optional<Good> optionalGood = goodRepository.findBySku(coreSku);
+
+            if (!optionalGood.isEmpty()){
+                good.setCoreGood(optionalGood.get());
+            }
+
             if (coreSku.isEmpty()){
                 throw new CoreSkuIsEmptyException("coreSku is empty for non-core item "+skuValue);
             }

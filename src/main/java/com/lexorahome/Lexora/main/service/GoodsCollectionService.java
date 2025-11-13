@@ -1,5 +1,6 @@
 package com.lexorahome.Lexora.main.service;
 
+import com.lexorahome.Lexora.main.entity.Brand;
 import com.lexorahome.Lexora.main.entity.GoodsCollection;
 import com.lexorahome.Lexora.main.repository.GoodsCollectionRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,8 @@ public class GoodsCollectionService {
                 .orElseGet(() -> {
                     GoodsCollection newCollection = new GoodsCollection();
                     newCollection.setName(name);
+                    newCollection.setCore(true);
+                    newCollection.setBrand(Brand.LEXORA);
                     return goodsCollectionRepository.save(newCollection);
                 });
 

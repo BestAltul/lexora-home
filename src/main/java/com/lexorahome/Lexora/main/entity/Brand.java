@@ -1,6 +1,15 @@
 package com.lexorahome.Lexora.main.entity;
 
+import lombok.Getter;
+
+@Getter
 public enum Brand {
-    LEXORA,
-    BM,
+    LEXORA("Lexora"),
+    BM("Sell & Modern");
+
+    private final String description;
+
+    Brand(String description){
+        this.description = description;
+    }
 }

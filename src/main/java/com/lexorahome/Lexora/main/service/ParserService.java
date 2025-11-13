@@ -63,4 +63,32 @@ public class ParserService {
 
         return mappedLines;
     }
+
+    public List<String> parseLexoraNotCoreSkuGuide(List<String> row){
+        final int IDX_SKU = 9;
+        final int IDX_OLD_SKU = 1;
+        final int IDX_TITLE = 12;
+        final int IDX_COLLECTION = 8;
+        final int IDX_CATEGORY = 4;
+        final int IDX_UPC = 10;
+        final int IDX_CORE_SKU = 11;
+        //final int IDX_IS_CORE = 10;
+
+        List<String> mappedLines = new ArrayList<>();
+        mappedLines.add(row.get(IDX_SKU));
+        mappedLines.add("");
+        mappedLines.add(row.get(IDX_TITLE));
+        mappedLines.add(row.get(IDX_COLLECTION));
+        mappedLines.add(row.get(IDX_CATEGORY));
+        mappedLines.add("");
+        mappedLines.add("");
+        mappedLines.add("");
+        mappedLines.add(row.get(IDX_UPC));
+        mappedLines.add("");
+        mappedLines.add("false");
+        mappedLines.add(row.get(0));
+
+
+        return mappedLines;
+    }
 }
