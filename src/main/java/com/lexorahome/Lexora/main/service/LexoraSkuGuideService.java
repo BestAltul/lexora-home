@@ -3,6 +3,7 @@ package com.lexorahome.Lexora.main.service;
 import com.lexorahome.Lexora.main.entity.DataSourceFactory;
 import com.lexorahome.Lexora.main.entity.DataSource;
 import com.lexorahome.Lexora.main.entity.Good;
+import com.lexorahome.Lexora.main.utils.ColumnBrandMapping;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -39,8 +41,39 @@ public class LexoraSkuGuideService {
             Good good = goodService.createGood(mappedLines);
 
             //2. Based on the template create related SKUs (white label, BM+SKUs)
-            List<String> mappedLinesNotCore = sheetSource.parseLexoraSkuNotCoreGuide(row);
-            Good goodNotCore = goodService.createNotCoreGood(mappedLinesNotCore);
+          //  List<String> mappedLinesNotCore = sheetSource.parseLexoraSkuNotCoreGuide(row);
+
+            Map<String,String> mapHomeDepotUs = ColumnBrandMapping.createMappingForLexoraHomeDepotUs();
+            Good goodNotCore = goodService.createNotCoreGood(row,mapHomeDepotUs);
+
+            Map<String,String> mapHomeDepotCa = ColumnBrandMapping.createMappingForLexoraHomeDepotCa();
+            Good goodNotCoreUs = goodService.createNotCoreGood(row,mapHomeDepotCa);
+
+            Map<String,String> mapLawes = ColumnBrandMapping.createMappingForLexoraLowes();
+            Good goodNotCoreLowes = goodService.createNotCoreGood(row,mapLawes);
+
+            Map<String,String> mapHouzz = ColumnBrandMapping.createMappingForLexoraHouzz();
+            Good goodNotCoreHouzz = goodService.createNotCoreGood(row,mapHouzz);
+
+            Map<String,String> mapAmazon = ColumnBrandMapping.createMappingForLexoraAmazon();
+            Good goodNotCoreAmazon = goodService.createNotCoreGood(row,mapAmazon);
+
+            Map<String,String> mapWayFair = ColumnBrandMapping.createMappingForLexoraWayfair();
+            Good goodNotCoreWayFair = goodService.createNotCoreGood(row,mapWayFair);
+
+            Map<String,String> mapOverStock = ColumnBrandMapping.createMappingForLexoraOverstock();
+            Good goodNotCoreOverStock = goodService.createNotCoreGood(row,mapOverStock);
+
+            Map<String,String> mapCanadianTire = ColumnBrandMapping.createMappingForLexoraCanadianTire();
+            Good goodNotCoreCanadianTire = goodService.createNotCoreGood(row,mapCanadianTire);
+
+            Map<String,String> mapTheBay = ColumnBrandMapping.createMappingForLexoraTheBay();
+            Good goodNotCoreTheBay = goodService.createNotCoreGood(row,mapTheBay);
+
+            Map<String,String> mapBMAmazon = ColumnBrandMapping.createMappingForBellModernAmazon();
+            Good goodNotCoreBMAmazon = goodService.createNotCoreGood(row,mapBMAmazon);
+
+
 
         }
 

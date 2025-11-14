@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum Brand {
     LEXORA("Lexora"),
-    BM("Sell & Modern");
+    BM("Bell & Modern");
 
     private final String description;
 

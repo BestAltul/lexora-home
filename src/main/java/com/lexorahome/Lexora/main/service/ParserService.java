@@ -71,7 +71,7 @@ public class ParserService {
         final int IDX_COLLECTION = 8;
         final int IDX_CATEGORY = 4;
         final int IDX_UPC = 10;
-        final int IDX_CORE_SKU = 11;
+        final int IDX_CORE_SKU = 6;
         //final int IDX_IS_CORE = 10;
 
         List<String> mappedLines = new ArrayList<>();
@@ -85,7 +85,7 @@ public class ParserService {
         mappedLines.add("");
         mappedLines.add(row.get(IDX_UPC));
         mappedLines.add("");
-        mappedLines.add("false");
+        mappedLines.add(row.get(IDX_CORE_SKU));
         mappedLines.add(row.get(0));
 
 
