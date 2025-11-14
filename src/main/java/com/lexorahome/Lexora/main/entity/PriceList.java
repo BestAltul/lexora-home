@@ -29,7 +29,7 @@ public class PriceList {
     private Set<Good> good = new HashSet<>();
 
     //private String sku;
-    private String exclusiveSku;
+  //  private String exclusiveSku;
     private String retailItemId;
 
     private LocalDate startAt;
