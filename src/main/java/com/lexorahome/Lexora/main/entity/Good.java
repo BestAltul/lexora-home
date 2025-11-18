@@ -10,7 +10,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class Good {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

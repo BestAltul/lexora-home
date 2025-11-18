@@ -16,6 +16,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v3/price-list").permitAll()
                         .requestMatchers("/api/v3/lexora-sku-guide").permitAll()
+                        .requestMatchers("/api/v3/skuuudle-report/upload").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults());
