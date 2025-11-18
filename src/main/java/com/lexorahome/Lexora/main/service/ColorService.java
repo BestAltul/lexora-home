@@ -14,6 +14,7 @@ public class ColorService {
 
     @Transactional
     public Color getOrCreateColor(String name){
+
         return colorRepository.findByNameIgnoreCase(name).orElseGet(()->{Color newColor = new Color();newColor.setName(name);return colorRepository.save(newColor);});
     }
 }

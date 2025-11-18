@@ -4,15 +4,18 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
 @Setter
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class SkuuudleReport {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -28,5 +31,5 @@ public class SkuuudleReport {
     private BigDecimal promoMap;
     private BigDecimal finalPrice;
     private String linkToTheSource;
-
+    private LocalDate dataCollected; // from the report
 }
