@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 
@@ -31,6 +32,8 @@ public class PersonService {
     private final JwtService jwtService;
     private final int MAX_ATTEMPTS = 5;
     private final RefreshRequestService refreshRequestService;
+    private final PersonRefreshTokenService personRefreshTokenService;
+
 
     private boolean isPersonExisting(String email){
         return personRepository.findByEmail(email).isPresent();
@@ -90,13 +93,25 @@ public class PersonService {
         Optional<Person> foundPerson = personRepository.findByEmail(signInRecord.email());
         if(foundPerson.isEmpty()){
             throw new PersonDoesNotExistException("User with "+signInRecord.email()+" doesn't exist");
-        }else{
-            if (isPersonAuthenticated(signInRecord,foundPerson.get())){
-                return modelMapper.map(foundPerson.get(),PersonRecord.class);
-            }else{
-                throw new IncorrectPasswordException("Incorrect password, after 5th attempt you will be blocked for 24 hours");
-            }
         }
+        Person person = foundPerson.get();
+        if (!isPersonAuthenticated(signInRecord,person)){
+           throw new IncorrectPasswordException("Incorrect password, after 5th attempt you will be blocked for 24 hours");
+        }
+
+        PersonRefreshToken refreshToken = PersonRefreshToken.builder()
+                .person(person)
+                .tokenHash(jwtService.generateRefreshToken(signInRecord.email()))
+                .createdAt(Instant.now())
+                .expiresAt(Instant.now().plus(1, ChronoUnit.DAYS))
+                .revoked(false)
+                .deviceInfo("")
+                .build();
+
+        personRefreshTokenService.save(refreshToken);
+
+        return modelMapper.map(foundPerson.get(),PersonRecord.class);
+
     }
 
     public String generateAccessToken(PersonRecord personRecord){
@@ -104,11 +119,12 @@ public class PersonService {
     }
 
     public String generateRefreshToken(PersonRecord personRecord){
-        return jwtService.generateRefreshToken(personRecord);
+        return jwtService.generateRefreshToken(personRecord.email());
     }
 
     public PersonRecord getPersonRecordByRefreshToken(RefreshRequestRecord refreshRequestRecord){
         Optional<PersonRefreshToken> personRefreshToken = refreshRequestService.getPersonRefreshToken(refreshRequestRecord.refreshToken(),refreshRequestRecord.email());
         return personRefreshToken.map(refreshToken -> modelMapper.map(refreshToken.getPerson(), PersonRecord.class)).orElse(null);
     }
+
 }

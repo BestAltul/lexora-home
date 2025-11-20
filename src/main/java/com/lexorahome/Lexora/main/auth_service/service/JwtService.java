@@ -32,9 +32,9 @@ public class JwtService {
                 .compact();
     }
 
-    public String generateRefreshToken(PersonRecord personRecord){
+    public String generateRefreshToken(String email){
         return Jwts.builder()
-                .setSubject(personRecord.email())
+                .setSubject(email)
                 .claim("role","USER")
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(24)))
