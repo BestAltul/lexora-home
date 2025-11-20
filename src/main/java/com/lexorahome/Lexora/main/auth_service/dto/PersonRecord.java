@@ -11,6 +11,6 @@ public record PersonRecord (String firstName,
         Instant createdAt,
         Instant lastLogin,
         Instant lockTime,
-        Instant tokenExpire,
+        Instant refreshTokenExpiration,
         boolean isEmailVerified,
         int failedAttempts){}

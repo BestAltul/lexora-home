@@ -33,6 +33,5 @@ public class Person {
     private Instant tokenExpiry;
     private boolean isEmailVerified;
     private int failedAttempts;
-    private boolean isBlocked;
-
+    private boolean isLocked;
 }
