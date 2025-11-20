@@ -53,6 +53,18 @@ public class PersonService {
             createdPerson.setCreatedAt(Instant.now());
             createdPerson.setEmailVerified(true);
             personRepository.save(createdPerson);
+
+            PersonRefreshToken refreshToken = PersonRefreshToken.builder()
+                    .person(createdPerson)
+                    .tokenHash(jwtService.generateRefreshToken(signUpRecord.email()))
+                    .createdAt(Instant.now())
+                    .expiresAt(Instant.now().plus(1, ChronoUnit.DAYS))
+                    .revoked(false)
+                    .deviceInfo("")
+                    .build();
+
+            personRefreshTokenService.save(refreshToken);
+
             return modelMapper.map(createdPerson,PersonRecord.class);
         }
     }
