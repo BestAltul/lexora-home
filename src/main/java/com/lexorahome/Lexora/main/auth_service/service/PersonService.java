@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
@@ -70,35 +69,41 @@ public class PersonService {
     }
 
     public boolean isPersonAuthenticated(SignInRecord signInRecord,Person person){
-        if (!person.isLocked() && authenticateService.passwordMatch(signInRecord,person)){
-            person.setFailedAttempts(0);
-            personRepository.save(person);
-            return true;
-        }else if(person.isLocked()){
 
-            Instant lockedTime = person.getLockTime();
-            Instant currentTime = Instant.now();
+        boolean passwordMatches = authenticateService.passwordMatch(signInRecord, person);
 
-            Duration durationSinceLock = Duration.between(lockedTime,currentTime);
-
-            if(durationSinceLock.toHours()<24){
-                throw new PersonIsLockedException("Person is still blocked");
-            }else{
-                person.setLocked(false);
-                person.setLockTime(null);
+        if (!person.isLocked()) {
+            if (passwordMatches) {
+                person.setFailedAttempts(0);
                 personRepository.save(person);
                 return true;
             }
-        }else{
-            if(authenticateService.isExceededLimitOfAttempts(person,MAX_ATTEMPTS)){
+
+            if (authenticateService.isExceededLimitOfAttempts(person, MAX_ATTEMPTS)) {
                 person.setLocked(true);
                 person.setLockTime(Instant.now());
                 personRepository.save(person);
-                throw new PersonIsLockedException("Person is blocked for 24 hours");
-            }else{
-                throw new IncorrectPasswordException("Incorrect password, after 5th attempt you will be blocked for 24 hours");
+                throw new PersonIsLockedException("Person is locked for 24 hours");
             }
+
+            throw new IncorrectPasswordException("Incorrect password, after 5th attempt you will be locked for 24 hours");
         }
+
+        Duration sinceLock = Duration.between(person.getLockTime(), Instant.now());
+
+        if (sinceLock.toHours() < 24) {
+            throw new PersonIsLockedException("Person is still locked");
+        }
+
+        if (passwordMatches) {
+            person.setLocked(false);
+            person.setLockTime(null);
+            person.setFailedAttempts(0);
+            personRepository.save(person);
+            return true;
+        }
+
+        throw new IncorrectPasswordException("Incorrect password, after 5th attempt you will be locked for 24 hours");
     }
 
     public PersonRecord signIn(SignInRecord signInRecord){
@@ -108,7 +113,7 @@ public class PersonService {
         }
         Person person = foundPerson.get();
         if (!isPersonAuthenticated(signInRecord,person)){
-           throw new IncorrectPasswordException("Incorrect password, after 5th attempt you will be blocked for 24 hours");
+           throw new IncorrectPasswordException("Incorrect password, after 5th attempt you will be locked for 24 hours");
         }
 
         PersonRefreshToken refreshToken = PersonRefreshToken.builder()

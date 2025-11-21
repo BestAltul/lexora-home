@@ -6,7 +6,6 @@ import com.lexorahome.Lexora.main.auth_service.entity.PersonRefreshToken;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.boot.Banner;
 import org.springframework.stereotype.Service;
 import io.jsonwebtoken.Jwts;
 
