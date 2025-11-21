@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +42,13 @@ public class PriceListService {
 
         return priceList;
     }
+
+//    public Map<String,String> getPriceList(String brand){
+//
+//        // I need more details. Stop for now. The policy of pricing.
+//
+//        return ;
+//    }
 
     public boolean uploadFiles(MultipartFile file,String sheetName,int maxColumns) throws IOException {
 
