@@ -1,9 +1,6 @@
 package com.lexorahome.Lexora.main.auth_service.service;
 
-import com.lexorahome.Lexora.main.auth_service.dto.PersonRecord;
-import com.lexorahome.Lexora.main.auth_service.dto.RefreshRequestRecord;
-import com.lexorahome.Lexora.main.auth_service.dto.SignInRecord;
-import com.lexorahome.Lexora.main.auth_service.dto.SignUpRecord;
+import com.lexorahome.Lexora.main.auth_service.dto.*;
 import com.lexorahome.Lexora.main.auth_service.entity.Person;
 import com.lexorahome.Lexora.main.auth_service.entity.PersonRefreshToken;
 import com.lexorahome.Lexora.main.auth_service.exception.IncorrectPasswordException;
@@ -18,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
@@ -88,13 +86,21 @@ public class PersonService {
                 throw new PersonIsLockedException("Person is locked for 24 hours");
             }
 
-            throw new IncorrectPasswordException("Incorrect password, after 5th attempt you will be locked for 24 hours");
+            person.setFailedAttempts(person.getFailedAttempts()+1);
+            personRepository.save(person);
+
+            throw new IncorrectPasswordException("Incorrect password, after "+(5-person.getFailedAttempts())+"-th attempt you will be locked for 24 hours");
         }
 
         Duration sinceLock = Duration.between(person.getLockTime(), Instant.now());
 
+        int hours = (int) sinceLock.toHours();
+        int minutes = (int) sinceLock.toMinutes();
+
         if (sinceLock.toHours() < 24) {
-            throw new PersonIsLockedException("Person is still locked");
+            int remainingHours = 23-hours;
+            int remailMinutes = 59-minutes;
+            throw new PersonIsLockedException("Person is still locked. Remaining time: "+remainingHours +" hours "+remailMinutes + " minutes");
         }
 
         if (passwordMatches) {
@@ -108,7 +114,7 @@ public class PersonService {
         throw new IncorrectPasswordException("Incorrect password, after 5th attempt you will be locked for 24 hours");
     }
 
-    public PersonRecord signIn(SignInRecord signInRecord){
+    public SignInResult signIn(SignInRecord signInRecord){
         Optional<Person> foundPerson = personRepository.findByEmail(signInRecord.email());
         if(foundPerson.isEmpty()){
             throw new PersonDoesNotExistException("User with "+signInRecord.email()+" doesn't exist");
@@ -131,7 +137,7 @@ public class PersonService {
                 .build();
         personRefreshTokenService.save(refreshTokenEntity);
 
-        return modelMapper.map(foundPerson.get(),PersonRecord.class);
+        return new SignInResult(modelMapper.map(foundPerson.get(),PersonRecord.class),refreshToken);
 
     }
 

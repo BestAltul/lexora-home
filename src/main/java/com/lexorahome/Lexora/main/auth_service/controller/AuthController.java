@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v3/auth")
@@ -34,15 +35,15 @@ public class AuthController {
 
     @PostMapping("/sign-in")
     public ResponseEntity<?> signIn(@RequestBody SignInRecord signInRecord){
-        PersonRecord personRecord = personService.signIn(signInRecord);
-        String accessToken = personService.generateAccessToken(personRecord);
-        String refreshToken = personService.generateRefreshToken(personRecord);
+        SignInResult signInResult = personService.signIn(signInRecord);
+        String accessToken = personService.generateAccessToken(signInResult.personRecord());
+        String refreshToken = signInResult.refreshToken();
 
         ResponseCookie refreshCookie = buildRefreshCookie(refreshToken);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE,refreshCookie.toString())
-                .body(Map.of("accessToken",accessToken,"person",personRecord));
+                .body(Map.of("accessToken",accessToken,"person",signInResult.personRecord()));
     }
 
     @PostMapping("/refresh")

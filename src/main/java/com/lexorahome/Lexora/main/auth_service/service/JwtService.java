@@ -1,7 +1,6 @@
 package com.lexorahome.Lexora.main.auth_service.service;
 
 import com.lexorahome.Lexora.main.auth_service.dto.PersonRecord;
-import com.lexorahome.Lexora.main.auth_service.dto.RefreshRequestRecord;
 import com.lexorahome.Lexora.main.auth_service.entity.PersonRefreshToken;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +13,6 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 @Service

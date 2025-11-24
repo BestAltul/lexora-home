@@ -29,7 +29,7 @@ public class PriceListController {
     }
 
 
-    public ResponseEntity<Map<String,String>> getPriceList(@RequestBody String Brand){
-        priceListService.
-    }
+//    public ResponseEntity<Map<String,String>> getPriceList(@RequestBody String Brand){
+//        priceListService.
+//    }
 }
