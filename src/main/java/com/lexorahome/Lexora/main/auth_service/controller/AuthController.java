@@ -19,6 +19,7 @@ import java.util.Map;
 public class AuthController {
     private final PersonService personService;
     private final JwtService jwtService;
+    private static final String REFRESH_TOKEN_NAME = "refreshToken";
 
 
     @PostMapping("/sign-up")
@@ -27,14 +28,7 @@ public class AuthController {
         String accessToken = personService.generateAccessToken(personRecord);
         String refreshToken = personService.generateRefreshToken(personRecord);
 
-        ResponseCookie refreshCookie = ResponseCookie.from("refreshtoken",refreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .path("/refresh")
-                .maxAge(1*24*60*60)
-                .sameSite("Strict")
-                .build();
-
+        ResponseCookie refreshCookie = buildRefreshCookie(refreshToken);
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,refreshCookie.toString()).body(Map.of("accessToken",accessToken));
     }
 
@@ -44,35 +38,36 @@ public class AuthController {
         String accessToken = personService.generateAccessToken(personRecord);
         String refreshToken = personService.generateRefreshToken(personRecord);
 
-        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken",refreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .path("/refresh")
-                .maxAge(1*24*60*60)
-                .sameSite("Strict")
-                .build();
-        return ResponseEntity.ok(Map.of("accessToken",accessToken,"person", personRecord));
+        ResponseCookie refreshCookie = buildRefreshCookie(refreshToken);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE,refreshCookie.toString())
+                .body(Map.of("accessToken",accessToken,"person",personRecord));
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(@RequestBody RefreshRequestRecord refreshRequestRecord){
+    public ResponseEntity<?> refresh(@CookieValue (name = REFRESH_TOKEN_NAME, required=false) String refreshToken){
 
-        if(!jwtService.isRefreshTokenValid(refreshRequestRecord)){
+        if(refreshToken==null || !jwtService.isRefreshTokenValid(refreshToken)){
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Invalid Refresh Token");
         }
 
-        PersonRecord personRecord = personService.getPersonRecordByRefreshToken(refreshRequestRecord);
+        PersonRecord personRecord = personService.getPersonRecordByRefreshToken(refreshToken);
         String newAccessToken = personService.generateAccessToken(personRecord);
         String newRefreshToken = personService.generateRefreshToken(personRecord);
 
-        ResponseCookie refreshCookie = ResponseCookie.from("refreshtoken",newRefreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .path("/refresh")
-                .maxAge(1*24*60*60)
-                .sameSite("Strict")
-                .build();
+        ResponseCookie refreshCookie = buildRefreshCookie(newRefreshToken);
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,refreshCookie.toString()).body(Map.of("accessToken",newAccessToken));
+    }
+
+    private ResponseCookie buildRefreshCookie(String token){
+        return ResponseCookie.from(REFRESH_TOKEN_NAME, token)
+                .httpOnly(true)
+                .secure(true)
+                .path("/api/v3/auth")
+                .maxAge(1 * 24 * 60 * 60)
+                .sameSite("Strict")
+                .build();
     }
 }

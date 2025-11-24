@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import io.jsonwebtoken.Jwts;
 
 import java.security.PrivateKey;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -20,6 +22,8 @@ public class JwtService {
     private final ModelMapper modelMapper;
     private final RefreshRequestService refreshRequestService;
     private PrivateKey privateKey;
+    private final SecureRandom secureRandom;
+
 
     public String generateAccessToken(PersonRecord personRecord){
         return Jwts.builder()
@@ -31,19 +35,15 @@ public class JwtService {
                 .compact();
     }
 
-    public String generateRefreshToken(String email){
-        return Jwts.builder()
-                .setSubject(email)
-                .claim("role","USER")
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(24)))
-                .signWith(privateKey, SignatureAlgorithm.RS256)
-                .compact();
+    public String generateRefreshToken(){
+        byte[] bytes = new byte[32];
+        secureRandom.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
-    public boolean isRefreshTokenValid(RefreshRequestRecord refreshRequestRecord){
+    public boolean isRefreshTokenValid(String refreshToken){
 
-        Optional<PersonRefreshToken> personRefreshToken = refreshRequestService.getPersonRefreshToken(refreshRequestRecord.refreshToken(),refreshRequestRecord.email());
+        Optional<PersonRefreshToken> personRefreshToken = refreshRequestService.getPersonRefreshToken(refreshToken);
 
         return personRefreshToken.isPresent();
     }

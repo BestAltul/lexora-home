@@ -32,6 +32,8 @@ public class PersonService {
     private final int MAX_ATTEMPTS = 5;
     private final RefreshRequestService refreshRequestService;
     private final PersonRefreshTokenService personRefreshTokenService;
+    private final TokenHashService tokenHashService;
+
 
 
     private boolean isPersonExisting(String email){
@@ -55,7 +57,7 @@ public class PersonService {
 
             PersonRefreshToken refreshToken = PersonRefreshToken.builder()
                     .person(createdPerson)
-                    .tokenHash(jwtService.generateRefreshToken(signUpRecord.email()))
+                    .tokenHash(jwtService.generateRefreshToken())
                     .createdAt(Instant.now())
                     .expiresAt(Instant.now().plus(1, ChronoUnit.DAYS))
                     .revoked(false)
@@ -116,16 +118,18 @@ public class PersonService {
            throw new IncorrectPasswordException("Incorrect password, after 5th attempt you will be locked for 24 hours");
         }
 
-        PersonRefreshToken refreshToken = PersonRefreshToken.builder()
+        String refreshToken = jwtService.generateRefreshToken();
+        String tokenHash = tokenHashService.hashToken(refreshToken);
+
+        PersonRefreshToken refreshTokenEntity = PersonRefreshToken.builder()
                 .person(person)
-                .tokenHash(jwtService.generateRefreshToken(signInRecord.email()))
+                .tokenHash(tokenHash)
                 .createdAt(Instant.now())
                 .expiresAt(Instant.now().plus(1, ChronoUnit.DAYS))
                 .revoked(false)
                 .deviceInfo("")
                 .build();
-
-        personRefreshTokenService.save(refreshToken);
+        personRefreshTokenService.save(refreshTokenEntity);
 
         return modelMapper.map(foundPerson.get(),PersonRecord.class);
 
@@ -136,12 +140,12 @@ public class PersonService {
     }
 
     public String generateRefreshToken(PersonRecord personRecord){
-        return jwtService.generateRefreshToken(personRecord.email());
+        return jwtService.generateRefreshToken();
     }
 
-    public PersonRecord getPersonRecordByRefreshToken(RefreshRequestRecord refreshRequestRecord){
-        Optional<PersonRefreshToken> personRefreshToken = refreshRequestService.getPersonRefreshToken(refreshRequestRecord.refreshToken(),refreshRequestRecord.email());
-        return personRefreshToken.map(refreshToken -> modelMapper.map(refreshToken.getPerson(), PersonRecord.class)).orElse(null);
+    public PersonRecord getPersonRecordByRefreshToken(String refreshToken){
+        Optional<PersonRefreshToken> personRefreshToken = refreshRequestService.getPersonRefreshToken(refreshToken);
+        return personRefreshToken.map(rToken -> modelMapper.map(rToken.getPerson(), PersonRecord.class)).orElse(null);
     }
 
 }
