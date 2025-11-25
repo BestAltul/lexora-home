@@ -46,6 +46,18 @@ public class AuthController {
                 .body(Map.of("accessToken",accessToken,"person",signInResult.personRecord()));
     }
 
+    @PostMapping("/reset-password-request")
+    public ResponseEntity<?> resetPasswordRequest(@RequestBody ResetPasswordRecord resetPasswordRecord){
+        personService.resetPassword(resetPasswordRecord.email());
+        return ResponseEntity.ok(ReplyMessageRecord.builder().message("Check your email!").build());
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody NewPasswordRecord newPasswordRecord){
+        boolean changed = personService.changePassword(newPasswordRecord.token(), newPasswordRecord.newPassword());
+        return ResponseEntity.ok(ReplyMessageRecord.builder().message("Password changed!").build());
+    }
+
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(@CookieValue (name = REFRESH_TOKEN_NAME, required=false) String refreshToken){
 

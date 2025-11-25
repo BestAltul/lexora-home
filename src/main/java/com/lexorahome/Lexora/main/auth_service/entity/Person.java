@@ -1,14 +1,14 @@
 package com.lexorahome.Lexora.main.auth_service.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.lexorahome.Lexora.main.entity.Role;
+import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.cglib.core.Local;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -34,4 +34,8 @@ public class Person {
     private boolean isEmailVerified;
     private int failedAttempts;
     private boolean isLocked;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Role> roles = new HashSet<>();
+
 }

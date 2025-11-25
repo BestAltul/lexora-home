@@ -8,7 +8,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.Customizer;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
-
 @Configuration
 public class SecurityConfig {
 
@@ -23,8 +22,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/v3/skuuudle-report/upload").permitAll()
                         .anyRequest().authenticated()
                 )
-                .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .httpBasic(Customizer.withDefaults());
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
         return http.build();
     }
 }
+

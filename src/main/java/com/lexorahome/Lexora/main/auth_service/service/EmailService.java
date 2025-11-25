@@ -21,7 +21,10 @@ public class EmailService {
                 "This link will expire in 1 hour.\n\n" +
                 "If you didn't request a password reset, please ignore this email.\n\n" +
                 "Best regards,\nLexora Team");
-        javaMailSender.send(message);
+        try{javaMailSender.send(message);}catch (Exception e){
+
+        }
+
     }
 }
 

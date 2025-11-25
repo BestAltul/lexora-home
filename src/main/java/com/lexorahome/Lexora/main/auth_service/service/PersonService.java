@@ -9,16 +9,20 @@ import com.lexorahome.Lexora.main.auth_service.exception.PersonAlreadyExistsExce
 import com.lexorahome.Lexora.main.auth_service.exception.PersonDoesNotExistException;
 import com.lexorahome.Lexora.main.auth_service.exception.PersonIsLockedException;
 import com.lexorahome.Lexora.main.auth_service.repository.PersonRepository;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
-
+import org.springframework.beans.factory.annotation.Value;
 
 @Service
 @RequiredArgsConstructor
@@ -31,8 +35,12 @@ public class PersonService {
     private final RefreshRequestService refreshRequestService;
     private final PersonRefreshTokenService personRefreshTokenService;
     private final TokenHashService tokenHashService;
-
-
+    private final EmailService emailService;
+    @Value("${app.reset-password-url}")
+    private String resetPasswordUrl;
+    @Value("${app.jwt-secret}")
+    private String secretKey;
+    private final PasswordEncoder passwordEncoder;
 
     private boolean isPersonExisting(String email){
         return personRepository.findByEmail(email).isPresent();
@@ -164,8 +172,10 @@ public class PersonService {
 
         String refreshToken = issueNewRefreshToken(person);
 
-        return new SignInResult(modelMapper.map(foundPerson.get(),PersonRecord.class),refreshToken);
-
+        //  return new SignInResult(modelMapper.map(foundPerson.get(),PersonRecord.class),refreshToken);
+        return new SignInResult(PersonRecord.builder()
+                .email(person.getEmail())
+                .build(), refreshToken);
     }
 
     public String generateAccessToken(PersonRecord personRecord){
@@ -180,5 +190,43 @@ public class PersonService {
         Optional<PersonRefreshToken> personRefreshToken = refreshRequestService.getPersonRefreshToken(refreshToken);
         return personRefreshToken.map(rToken -> modelMapper.map(rToken.getPerson(), PersonRecord.class)).orElse(null);
     }
+
+    public void resetPassword(String email) {
+        Optional<Person> userOpt = personRepository.findByEmail(email);
+        if (userOpt.isEmpty()) return;
+
+        Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+        String token = jwtService.generateResetToken(email, key);
+        String link = resetPasswordUrl + "?token=" + token;
+
+        emailService.sendResetPasswordEmail(email, link);
+    }
+
+    public boolean changePassword(String token, String newPassword) {
+        Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+
+        try {
+            String email = jwtService.validateResetToken(token, key);
+
+            Optional<Person> personOpt = personRepository.findByEmail(email);
+
+            if (personOpt.isEmpty()) {
+                throw new RuntimeException("User not found");
+            }
+
+            Person person = personOpt.get();
+
+            String hashedPassword = passwordEncoder.encode(newPassword);
+            person.setPassword(hashedPassword);
+
+            personRepository.save(person);
+
+            return true;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Reset token is not valid "+e.getMessage());
+        }
+    }
+
 
 }
