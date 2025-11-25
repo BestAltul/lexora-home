@@ -15,8 +15,8 @@ public class AuthenticateService {
         return passwordEncoder.encode(password);
     }
 
-    public boolean passwordMatch(SignInRecord signInRecord,Person person){
-        return passwordEncoder.matches(signInRecord.password(), person.getPassword());
+    public boolean passwordMatch(String signInRecordPassword,String personPassword){
+        return passwordEncoder.matches(signInRecordPassword, personPassword);
     }
 
     public boolean isExceededLimitOfAttempts(Person person,int limitAttempts){

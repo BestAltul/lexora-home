@@ -69,8 +69,24 @@ public class PersonService {
     }
 
     public boolean isPersonAuthenticated(SignInRecord signInRecord,Person person){
+        boolean passwordMatches;
 
-        boolean passwordMatches = authenticateService.passwordMatch(signInRecord, person);
+        boolean inputEmpty = signInRecord.password().isBlank();
+        boolean storedEmpty = person.getPassword() == null;
+
+//        if(inputEmpty && storedEmpty){
+//            return true;
+//        }
+
+        if(inputEmpty){
+            throw new IncorrectPasswordException("The password can't be empty");
+        }
+
+        if(storedEmpty){
+            return false;
+        }
+
+        passwordMatches = authenticateService.passwordMatch(signInRecord.password(), person.getPassword());
 
         if (!person.isLocked()) {
             if (passwordMatches) {
@@ -114,6 +130,28 @@ public class PersonService {
         throw new IncorrectPasswordException("Incorrect password, after 5th attempt you will be locked for 24 hours");
     }
 
+
+
+    public String issueNewRefreshToken(Person person){
+
+        personRefreshTokenService.revokeToken(person);
+
+        String refreshToken = jwtService.generateRefreshToken();
+        String tokenHash = tokenHashService.hashToken(refreshToken);
+
+        PersonRefreshToken entity = PersonRefreshToken.builder()
+                .person(person)
+                .tokenHash(tokenHash)
+                .createdAt(Instant.now())
+                .expiresAt(Instant.now().plus(1,ChronoUnit.DAYS))
+                .revoked(false)
+                .build();
+
+        personRefreshTokenService.save(entity);
+
+        return refreshToken;
+    }
+
     public SignInResult signIn(SignInRecord signInRecord){
         Optional<Person> foundPerson = personRepository.findByEmail(signInRecord.email());
         if(foundPerson.isEmpty()){
@@ -124,18 +162,7 @@ public class PersonService {
            throw new IncorrectPasswordException("Incorrect password, after 5th attempt you will be locked for 24 hours");
         }
 
-        String refreshToken = jwtService.generateRefreshToken();
-        String tokenHash = tokenHashService.hashToken(refreshToken);
-
-        PersonRefreshToken refreshTokenEntity = PersonRefreshToken.builder()
-                .person(person)
-                .tokenHash(tokenHash)
-                .createdAt(Instant.now())
-                .expiresAt(Instant.now().plus(1, ChronoUnit.DAYS))
-                .revoked(false)
-                .deviceInfo("")
-                .build();
-        personRefreshTokenService.save(refreshTokenEntity);
+        String refreshToken = issueNewRefreshToken(person);
 
         return new SignInResult(modelMapper.map(foundPerson.get(),PersonRecord.class),refreshToken);
 

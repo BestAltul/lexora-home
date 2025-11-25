@@ -12,7 +12,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @Builder
-@Table(name = "person_refresh_tokens")
+@Table(name = "person_refresh_token")
 public class PersonRefreshToken {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

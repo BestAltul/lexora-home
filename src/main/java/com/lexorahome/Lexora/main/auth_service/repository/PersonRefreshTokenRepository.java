@@ -18,4 +18,13 @@ public interface PersonRefreshTokenRepository extends JpaRepository<PersonRefres
     Optional<PersonRefreshToken> findByTokenHash(String tokenHash);
 
     List<PersonRefreshToken> findAllByPersonId(UUID personId);
+
+    @Query("""
+    SELECT r 
+    FROM PersonRefreshToken r 
+    WHERE r.person.id = :personId 
+      AND r.revoked = false
+""")
+    Optional<PersonRefreshToken> findByPersonIdAndRevokedFalse(@Param("personId") UUID personId);
+
 }
