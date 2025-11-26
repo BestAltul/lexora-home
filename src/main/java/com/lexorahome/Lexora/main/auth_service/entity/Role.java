@@ -1,4 +1,4 @@
-package com.lexorahome.Lexora.main.entity;
+package com.lexorahome.Lexora.main.auth_service.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

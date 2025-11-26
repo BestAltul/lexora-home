@@ -33,7 +33,7 @@ public class GoodsCollectionService {
                     GoodsCollection newCollection = new GoodsCollection();
                     newCollection.setName(name);
                     newCollection.setCore(true);
-                    newCollection.setBrand(Brand.LEXORA);
+                    //newCollection.setBrand(Brand.LEXORA);
                     return goodsCollectionRepository.save(newCollection);
                 });
 
@@ -58,9 +58,9 @@ public class GoodsCollectionService {
         newGoodsCollection.setName(name);
         newGoodsCollection.setCoreCollection(coreCollection);
         if(brand.equals("Lexora")){
-            newGoodsCollection.setBrand(Brand.LEXORA);
+       //     newGoodsCollection.setBrand(Brand.LEXORA);
         }else{
-            newGoodsCollection.setBrand(Brand.BM);
+       //     newGoodsCollection.setBrand(Brand.BM);
         }
 
         Retail retailCreated = retailService.getOrCreateRetail(retail);

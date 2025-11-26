@@ -1,15 +1,25 @@
 package com.lexorahome.Lexora.main.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
+import java.util.UUID;
 
 @Getter
-public enum Brand {
-    LEXORA("Lexora"),
-    BM("Bell & Modern");
+@Setter
+@RequiredArgsConstructor
+@NoArgsConstructor
+@Entity
+public class Brand {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
 
-    private final String description;
-
-    Brand(String description){
-        this.description = description;
-    }
+    private String name;
 }

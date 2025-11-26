@@ -18,8 +18,6 @@ public class GoodsCollection {
     private UUID id;
 
     private String name;
-
-    @Enumerated(EnumType.STRING)
     private Brand brand;
 
     @ManyToOne(fetch = FetchType.LAZY)

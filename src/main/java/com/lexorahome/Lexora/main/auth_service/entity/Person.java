@@ -1,12 +1,9 @@
 package com.lexorahome.Lexora.main.auth_service.entity;
 
-import com.lexorahome.Lexora.main.entity.Role;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.cglib.core.Local;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -35,7 +32,7 @@ public class Person {
     private int failedAttempts;
     private boolean isLocked;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Role> roles = new HashSet<>();
+//    @ManyToMany(fetch = FetchType.EAGER)
+//    private Set<Role> roles = new HashSet<>();
 
 }
