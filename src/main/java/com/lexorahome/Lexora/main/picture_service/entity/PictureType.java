@@ -2,6 +2,7 @@ package com.lexorahome.Lexora.main.picture_service.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.envers.Audited;
 
 import java.util.List;
 import java.util.UUID;
@@ -11,6 +12,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
+@Audited
 @Entity
 public class PictureType {
     @Id

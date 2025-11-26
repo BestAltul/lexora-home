@@ -14,7 +14,6 @@ import java.util.UUID;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@NoArgsConstructor
 @Entity
 public class Brand {
     @Id

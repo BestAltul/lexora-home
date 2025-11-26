@@ -18,6 +18,9 @@ public class GoodsCollection {
     private UUID id;
 
     private String name;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="brand_id")
     private Brand brand;
 
     @ManyToOne(fetch = FetchType.LAZY)

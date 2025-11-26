@@ -170,9 +170,9 @@ public class GoodService {
                 existingCollection.setRetail(foundRetail);
                 existingCollection.setName(row.get(IDX_COLLECTION));
                 if(VAL_BRAND.equals("Lexora")){
-                    existingCollection.setBrand(Brand.LEXORA);
+                //    existingCollection.setBrand(Brand.LEXORA);
                 }else{
-                    existingCollection.setBrand(Brand.BM);
+               //     existingCollection.setBrand(Brand.BM);
                 }
                 goodsCollectionService.save(existingCollection);
             }
