@@ -1,25 +1,27 @@
 package com.lexorahome.Lexora.main.picture_service.controller;
 
 import com.lexorahome.Lexora.main.picture_service.dto.PictureRecord;
+import com.lexorahome.Lexora.main.picture_service.dto.PictureTypeRecord;
 import com.lexorahome.Lexora.main.picture_service.entity.Picture;
 import com.lexorahome.Lexora.main.picture_service.service.PictureService;
+import com.lexorahome.Lexora.main.picture_service.service.PictureTypeService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v3/picture")
 public class PictureRestController {
-    private PictureService pictureService;
-    private ModelMapper modelMapper;
+    private final PictureService pictureService;
+    private final ModelMapper modelMapper;
+    private final PictureTypeService pictureTypeService;
 
     @PostMapping("/upload")
     public ResponseEntity<?> uploadPicture(@RequestParam("file") MultipartFile file) throws IOException {
@@ -30,5 +32,11 @@ public class PictureRestController {
         Picture picture = pictureService.uploadPicture(file);
 
         return ResponseEntity.ok(modelMapper.map(picture, PictureRecord.class));
+    }
+
+    @GetMapping("/types")
+    public ResponseEntity<List<PictureTypeRecord>> getAllPictureTypes(){
+        List<PictureTypeRecord> pictureTypeRecordList = pictureTypeService.getAllPictureTypeRecord();
+        return ResponseEntity.ok(pictureTypeRecordList);
     }
 }
