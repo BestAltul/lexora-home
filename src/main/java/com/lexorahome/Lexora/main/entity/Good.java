@@ -1,7 +1,9 @@
 package com.lexorahome.Lexora.main.entity;
 
+import com.lexorahome.Lexora.main.picture_service.entity.Picture;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.envers.Audited;
 
 import java.util.List;
 import java.util.UUID;
@@ -10,6 +12,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
+@Audited
 @AllArgsConstructor
 @NoArgsConstructor
 public class Good {
@@ -44,4 +47,7 @@ public class Good {
     private ProductType productType;
 
     private KitOrSingle kitOrSingle;
+
+    @OneToMany(mappedBy = "good", cascade = CascadeType.ALL)
+    private List<Picture> picture;
 }

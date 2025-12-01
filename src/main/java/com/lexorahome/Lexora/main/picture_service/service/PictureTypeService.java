@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
-
 @RequiredArgsConstructor
 @Service
 public class PictureTypeService {
@@ -25,6 +23,6 @@ public class PictureTypeService {
 
     public List<PictureTypeRecord> getAllPictureTypeRecord(){
         List<PictureType> pictureTypeList = getAllPictureType();
-        return pictureTypeMapper.toProductTypeList(pictureTypeList);
+        return pictureTypeMapper.toPictureTypeList(pictureTypeList);
     }
 }

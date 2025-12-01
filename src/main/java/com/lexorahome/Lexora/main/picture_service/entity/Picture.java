@@ -1,10 +1,9 @@
 package com.lexorahome.Lexora.main.picture_service.entity;
 
 
+import com.lexorahome.Lexora.main.entity.Good;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.envers.Audited;
 
 import java.time.Instant;
@@ -14,6 +13,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Audited
+@Getter
+@Setter
 @Entity
 public class Picture {
     @Id
@@ -32,5 +33,9 @@ public class Picture {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="picture_type_id")
     private PictureType pictureType;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="good_id")
+    private Good good;
 
 }

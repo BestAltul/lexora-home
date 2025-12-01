@@ -2,6 +2,7 @@ package com.lexorahome.Lexora.main.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -15,11 +16,16 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/v3/auth/**").permitAll()
                         .requestMatchers("/api/v3/price-list").permitAll()
                         .requestMatchers("/api/v3/picture/types").permitAll()
-                        .requestMatchers("/api/v3/goods").permitAll()
+                        .requestMatchers("/api/v3/picture/**").permitAll()
+                        .requestMatchers("/api/v3/categories").permitAll()
+                        .requestMatchers("/api/v3/colors").permitAll()
+                        .requestMatchers("/api/v3/goods/**").permitAll()
                         .requestMatchers("/api/v3/lexora-sku-guide").permitAll()
                         .requestMatchers("/api/v3/skuuudle-report/upload").permitAll()
                         .anyRequest().authenticated()
