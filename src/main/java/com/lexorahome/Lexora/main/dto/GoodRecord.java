@@ -8,12 +8,12 @@ import java.util.UUID;
 public record GoodRecord(UUID id,
                          String sku,
                          String title,
-                         boolean isScore,
+                         boolean isCore,
                          String upc,
                          GoodsCollectionRecord goodsCollectionRecord,
                          GoodRecord coreGood,
                          ColorRecord colorRecord,
                          CategoryRecord categoryRecord,
-                         ProductTypeRecord productTypeRecord,
+                         ProductTypeRecord productType,
                          KitOrSingle kitOrSingle) {
 }
