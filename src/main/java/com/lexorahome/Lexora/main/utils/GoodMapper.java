@@ -16,8 +16,6 @@ import java.util.List;
         builder = @Builder(disableBuilder = true)
 )
 public interface GoodMapper {
-    @Mapping(source = "picture", target = "picture")
     GoodRecord toRecord(Good good);
-
     List<GoodRecord> toRecordList(List<Good> goods);
 }
