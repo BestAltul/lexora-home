@@ -20,7 +20,9 @@ public class PictureType {
     private UUID id;
 
     private String name;
-    private String short_name;
+
+    @Column(name = "short_name")
+    private String shortName;
 
     @OneToMany(mappedBy = "pictureType",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Picture> pictures;

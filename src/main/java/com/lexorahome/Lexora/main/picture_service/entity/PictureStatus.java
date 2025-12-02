@@ -1,5 +1,7 @@
 package com.lexorahome.Lexora.main.picture_service.entity;
 
+import lombok.Builder;
+
 public enum PictureStatus {
     UPLOADED ("The picture is uploaded"),
     REVIEW_REQUIRED ("Needs validation"),

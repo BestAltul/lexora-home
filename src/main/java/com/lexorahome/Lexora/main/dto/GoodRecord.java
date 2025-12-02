@@ -2,6 +2,7 @@ package com.lexorahome.Lexora.main.dto;
 
 import com.lexorahome.Lexora.main.entity.KitOrSingle;
 import com.lexorahome.Lexora.main.picture_service.dto.PictureRecord;
+import com.lexorahome.Lexora.main.picture_service.dto.short_record.PictureRecordShort;
 import lombok.Builder;
 
 import java.util.List;
@@ -19,5 +20,5 @@ public record GoodRecord(UUID id,
                          CategoryRecord categoryRecord,
                          ProductTypeRecord productType,
                          KitOrSingle kitOrSingle,
-                         List<PictureRecord> picture) {
+                         List<PictureRecordShort> picture) {
 }

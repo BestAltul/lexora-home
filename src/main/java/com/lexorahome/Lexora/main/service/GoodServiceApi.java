@@ -9,6 +9,7 @@ import com.lexorahome.Lexora.main.picture_service.repository.PictureRepository;
 import com.lexorahome.Lexora.main.picture_service.service.PictureService;
 import com.lexorahome.Lexora.main.repository.GoodRepository;
 import com.lexorahome.Lexora.main.utils.GoodMapper;
+import com.lexorahome.Lexora.main.utils.GoodMapperCustom;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -35,7 +36,7 @@ public class GoodServiceApi {
     @Transactional
     public List<GoodRecord> getAllGoodRecords(){
         List<Good> goodList = getAllGoods();
-        return goodMapper.toRecordList(goodList);
+        return GoodMapperCustom.toListGoodRecord(goodList);
     }
 
 
