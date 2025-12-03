@@ -12,6 +12,5 @@ public class PictureRequest {
     private String pictureStatus;
     private String pictureTypeId;
     private String goodId;
-    private String link;
-    private String file;
+    private String link;    
 }

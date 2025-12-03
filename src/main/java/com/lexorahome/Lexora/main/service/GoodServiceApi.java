@@ -4,6 +4,7 @@ import com.lexorahome.Lexora.main.dto.GoodRecord;
 import com.lexorahome.Lexora.main.entity.Good;
 import com.lexorahome.Lexora.main.exception.GoodNotFoundById;
 import com.lexorahome.Lexora.main.picture_service.dto.PictureRecord;
+import com.lexorahome.Lexora.main.picture_service.dto.short_record.PictureRecordShort;
 import com.lexorahome.Lexora.main.picture_service.entity.Picture;
 import com.lexorahome.Lexora.main.picture_service.repository.PictureRepository;
 import com.lexorahome.Lexora.main.picture_service.service.PictureService;
@@ -46,29 +47,35 @@ public class GoodServiceApi {
         return goodMapper.toRecord(good);
     }
 
-    public boolean updateGood(GoodRecord goodRecord,String id) {
+    public boolean updateGood(GoodRecord goodRecord, String id) {
 
-        UUID foundId = UUID.fromString(id);
-        Picture updatePicture;
-        Optional<Picture> pictureOptional = pictureRepository.findById(foundId);
-        if (pictureOptional.isPresent()) {
-            updatePicture = pictureOptional.get();
+        UUID goodId = UUID.fromString(id);
+
+        Good good = goodRepository.findById(goodId)
+                .orElseThrow(() -> new GoodNotFoundById("Good not found by ID " + id));
+
+        PictureRecordShort dto = goodRecord.picture().get(0);
+
+        Picture picture;
+
+        if (dto.id() != null) {
+
+            picture = pictureRepository.findById(dto.id())
+                    .orElseThrow(() -> new RuntimeException("Picture not found"));
         } else {
-            updatePicture = new Picture();
+
+            picture = new Picture();
+            picture.setGood(good);
         }
 
+        picture.setName(dto.name());
+        picture.setNotes(dto.notes());
+        picture.setLink(dto.link());
+        picture.setGood(good);
 
-        updatePicture.setLink(goodRecord.picture().get(0).link());
-        updatePicture.setName(goodRecord.picture().get(0).name());
-        updatePicture.setNotes(goodRecord.picture().get(0).notes());
+        pictureRepository.save(picture);
 
-        List<Picture> newList = new ArrayList<>();
-        newList.add(updatePicture);
-
-        Good good = goodRepository.findById(foundId).orElseThrow(()->new GoodNotFoundById("Good not found by ID "+id));
-        good.setPicture(newList);
-
-        goodRepository.save(good);
         return true;
     }
+
 }

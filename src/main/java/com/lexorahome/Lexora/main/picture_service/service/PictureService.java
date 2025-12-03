@@ -1,5 +1,6 @@
 package com.lexorahome.Lexora.main.picture_service.service;
 
+import com.lexorahome.Lexora.main.entity.Good;
 import com.lexorahome.Lexora.main.exception.PictureNotFoundById;
 import com.lexorahome.Lexora.main.picture_service.dto.PictureRecord;
 import com.lexorahome.Lexora.main.picture_service.dto.in.PictureRequest;
@@ -8,6 +9,7 @@ import com.lexorahome.Lexora.main.picture_service.entity.PictureStatus;
 import com.lexorahome.Lexora.main.picture_service.entity.PictureType;
 import com.lexorahome.Lexora.main.picture_service.file_storage.PictureStorage;
 import com.lexorahome.Lexora.main.picture_service.repository.PictureRepository;
+import com.lexorahome.Lexora.main.repository.GoodRepository;
 import com.lexorahome.Lexora.main.repository.PictureTypeRepository;
 import com.lexorahome.Lexora.main.utils.PictureMapper;
 import com.lexorahome.Lexora.main.utils.PictureMapperCustom;
@@ -32,6 +34,7 @@ public class PictureService {
     private final PictureStorage pictureStorage;
     private final PictureMapper pictureMapper;
     private final PictureTypeRepository pictureTypeRepository;
+    private final GoodRepository goodRepository;
 
     public Picture uploadPicture(MultipartFile file) throws IOException {
         String path = pictureStorage.save(file);
@@ -68,6 +71,10 @@ public class PictureService {
 
     public PictureRecord createPicture(PictureRequest pictureRequest,MultipartFile file){
 
+        UUID goodId = UUID.fromString(pictureRequest.getGoodId());
+        Good good = goodRepository.findById(goodId)
+                .orElseThrow(() -> new RuntimeException("Good not found by id: " + goodId));
+
         Picture picture = Picture.builder()
                 .name(pictureRequest.getName())
                 .notes(pictureRequest.getNotes())
@@ -79,6 +86,8 @@ public class PictureService {
 
         pictureTypeRepository.findByShortName(pictureRequest.getPictureTypeId())
                 .ifPresent(picture::setPictureType);
+
+        picture.setGood(good);
 
         if (file != null && !file.isEmpty()) {
             try {

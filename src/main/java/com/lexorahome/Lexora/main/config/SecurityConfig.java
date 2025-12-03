@@ -20,6 +20,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/api/v3/auth/**").permitAll()
                         .requestMatchers("/api/v3/price-list").permitAll()
                         .requestMatchers("/api/v3/picture/types").permitAll()
