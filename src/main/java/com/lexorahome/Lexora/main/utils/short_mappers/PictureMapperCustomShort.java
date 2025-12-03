@@ -16,6 +16,7 @@ public class PictureMapperCustomShort {
                 .notes(picture.getNotes())
                 .link(picture.getLink())
                 .createdAt(picture.getCreatedAt())
+                .correct(picture.isCorrect())
                 .pictureType(PictureTypeMapperCustom.toPictureTypeRecord(picture.getPictureType()))
                 .priority(picture.getPriority())
                 .pictureStatus(picture.getPictureStatus()).build();

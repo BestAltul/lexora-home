@@ -29,6 +29,7 @@ public class Picture {
     private Instant modifiedAt;
     @Enumerated(EnumType.STRING)
     private PictureStatus pictureStatus;
+    private boolean correct;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="picture_type_id")

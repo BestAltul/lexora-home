@@ -6,11 +6,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PictureRequest {
+    private String pictureId;
     private String name;
     private String priority;
     private String notes;
     private String pictureStatus;
     private String pictureTypeId;
     private String goodId;
-    private String link;    
+    private String link;
+    private boolean correct;
 }

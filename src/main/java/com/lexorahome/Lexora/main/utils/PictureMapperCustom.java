@@ -12,6 +12,7 @@ public class PictureMapperCustom {
                 .name(picture.getName())
                 .notes(picture.getNotes())
                 .link(picture.getLink())
+                .correct(picture.isCorrect())
                 .createdAt(picture.getCreatedAt())
                 .good(GoodMapperCustom.toGoodRecord(picture.getGood()))
                 .pictureType(PictureTypeMapperCustom.toPictureTypeRecord(picture.getPictureType()))

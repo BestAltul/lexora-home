@@ -2,17 +2,20 @@ package com.lexorahome.Lexora.main.picture_service.service;
 
 import com.lexorahome.Lexora.main.entity.Good;
 import com.lexorahome.Lexora.main.exception.PictureNotFoundById;
+import com.lexorahome.Lexora.main.exception.PictureTypeNotFoundByShortName;
 import com.lexorahome.Lexora.main.picture_service.dto.PictureRecord;
 import com.lexorahome.Lexora.main.picture_service.dto.in.PictureRequest;
+import com.lexorahome.Lexora.main.picture_service.dto.short_record.PictureRecordShort;
 import com.lexorahome.Lexora.main.picture_service.entity.Picture;
 import com.lexorahome.Lexora.main.picture_service.entity.PictureStatus;
 import com.lexorahome.Lexora.main.picture_service.entity.PictureType;
-import com.lexorahome.Lexora.main.picture_service.file_storage.PictureStorage;
 import com.lexorahome.Lexora.main.picture_service.repository.PictureRepository;
 import com.lexorahome.Lexora.main.repository.GoodRepository;
 import com.lexorahome.Lexora.main.repository.PictureTypeRepository;
 import com.lexorahome.Lexora.main.utils.PictureMapper;
 import com.lexorahome.Lexora.main.utils.PictureMapperCustom;
+import com.lexorahome.Lexora.main.utils.short_mappers.PictureMapperCustomShort;
+import com.lexorahome.Lexora.main.utils.short_mappers.PictureTypeMapperCustomShort;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,30 +34,69 @@ import java.util.UUID;
 @Service
 public class PictureService {
     private final PictureRepository pictureRepository;
-    private final PictureStorage pictureStorage;
     private final PictureMapper pictureMapper;
     private final PictureTypeRepository pictureTypeRepository;
     private final GoodRepository goodRepository;
 
-    public Picture uploadPicture(MultipartFile file) throws IOException {
-        String path = pictureStorage.save(file);
-        Picture picture = Picture.builder()
-                .name(file.getOriginalFilename())
-                .link(path)
-                .createdAt(Instant.now())
-                .modifiedAt(Instant.now())
-                .build();
-        return pictureRepository.save(picture);
-    }
-
     public List<PictureRecord> getAllPictureRecords(){
         List<Picture> pictureList = pictureRepository.findAll();
-        return pictureMapper.toPictureList(pictureList);
+        return PictureMapperCustom.toListPictureRecord(pictureList);
     }
     public PictureRecord findPictureRecordById(String id){
         UUID foundId = UUID.fromString(id);
         Picture picture = pictureRepository.findById(foundId).orElseThrow(()->new PictureNotFoundById("Picture not found by ID "+id));
         return PictureMapperCustom.toPictureRecord(picture);
+    }
+
+
+    private String storeFile(MultipartFile file) {
+        if (file == null || file.isEmpty()) return null;
+
+        try {
+            String filename = file.getOriginalFilename();
+            Path path = Paths.get("uploads/" + filename);
+            Files.createDirectories(path.getParent());
+            Files.write(path, file.getBytes());
+            return "/uploads/" + filename;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to store file", e);
+        }
+    }
+
+    public PictureRecordShort updatePicture(String id, PictureRequest pictureRequest,MultipartFile file){
+
+        UUID foundPictureId = UUID.fromString(id);
+
+        Picture picture = pictureRepository.findById(foundPictureId).orElseThrow(()->new PictureNotFoundById("Picture for updating is not found "+foundPictureId));
+        if(pictureRequest.getPriority()!=null){
+            picture.setPriority(Integer.parseInt(pictureRequest.getPriority()));
+        }
+        if(pictureRequest.getNotes()!=null){
+            picture.setNotes(pictureRequest.getNotes());
+        }
+        if(pictureRequest.getPictureStatus()!=null){
+            picture.setPictureStatus(PictureStatus.valueOf(pictureRequest.getPictureStatus()));
+        }
+        if(pictureRequest.getLink()!=null){
+            picture.setLink(pictureRequest.getLink());
+        }
+        if(pictureRequest.getPictureTypeId()!=null){
+            PictureType pictureType = pictureTypeRepository.findByShortName(pictureRequest.getPictureTypeId()).orElseThrow(()->new PictureTypeNotFoundByShortName(pictureRequest.getPictureTypeId()));
+            picture.setPictureType(pictureType);
+        }
+
+        picture.setCorrect(pictureRequest.isCorrect());
+
+        String fileLink = storeFile(file);
+        if (fileLink != null) {
+            picture.setLink(fileLink);
+        } else if (pictureRequest.getLink() != null) {
+            picture.setLink(pictureRequest.getLink());
+        }
+
+        pictureRepository.save(picture);
+
+        return PictureMapperCustomShort.toPictureRecordShort(picture);
     }
 
     @Transactional
@@ -89,17 +131,9 @@ public class PictureService {
 
         picture.setGood(good);
 
-        if (file != null && !file.isEmpty()) {
-            try {
-                String filename = file.getOriginalFilename();
-                Path path = Paths.get("uploads/" + filename);
-                Files.createDirectories(path.getParent());
-                Files.write(path, file.getBytes());
-
-                picture.setLink("/uploads/" + filename);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to store file", e);
-            }
+        String fileLink = storeFile(file);
+        if (fileLink != null) {
+            picture.setLink(fileLink);
         } else if (pictureRequest.getLink() != null) {
             picture.setLink(pictureRequest.getLink());
         }

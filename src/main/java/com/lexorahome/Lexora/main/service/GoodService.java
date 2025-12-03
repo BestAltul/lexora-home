@@ -184,11 +184,6 @@ public class GoodService {
         good.setSku(skuValue);
         good.setTitle(safeGet(row, IDX_TITLE));
 
-//        String oldSku = safeGet(row, IDX_OLD_SKU);
-//        if (!oldSku.isEmpty()) {
-//            good.setOldSku(oldSku);
-//        }
-
         String isCoreValue = safeGet(row, IDX_IS_CORE);
         if (isCoreValue.equals("yes")){
             good.setCore(true);
@@ -218,26 +213,6 @@ public class GoodService {
             Category category = categoryService.getOrCreateCategory(categoryName);
             good.setCategory(category);
         }
-
-
-//        String colorName = safeGet(row, IDX_COLOR);
-//        if (!colorName.isEmpty()) {
-//            Color color = colorService.getOrCreateColor(colorName);
-//            good.setColor(color);
-//        }
-
-
-//        String productTypeName = safeGet(row, IDX_PRODUCT_TYPE);
-//        if (!productTypeName.isEmpty()) {
-//            ProductType productType = productTypeService.getOrCreateProductType(productTypeName);
-//            good.setProductType(productType);
-//        }
-
-//        String kitOrSingleTextValue = safeGet(row, IDX_KIT_SINGLE);
-//        if (!productTypeName.isEmpty()) {
-//            KitOrSingle kitOrSingle = KitOrSingle.fromString(kitOrSingleTextValue);
-//            good.setKitOrSingle(kitOrSingle);
-//        }
 
         String upcRaw = safeGet(row, IDX_UPC);
         if (!upcRaw.isEmpty()) {
