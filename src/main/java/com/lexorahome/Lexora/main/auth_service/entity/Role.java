@@ -1,23 +1,26 @@
 package com.lexorahome.Lexora.main.auth_service.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.util.UUID;
 
-@Builder
-@AllArgsConstructor
 @RequiredArgsConstructor
 @Getter
 @Setter
 @Entity
-public class Role {
+public class Role implements GrantedAuthority {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    private String name;
+    @Column(unique = true,nullable = false)
+    private final String name;
+
+
+    @Override
+    public String getAuthority() {
+        return name;
+    }
 }

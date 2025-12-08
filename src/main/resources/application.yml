@@ -5,28 +5,19 @@ app:
   jwt-private-key: |
     -----BEGIN RSA PRIVATE KEY-----
     MIICXQIBAAKBgQCZaPlOjwixunvuQ0GXZfK6p/xphleijCJKKTNsEYkgpqLA72cV
-    vqSJmQC/oKOAkQbDy9jwy6OtZzHvLRKdCBiGO7RnyaOScCdho+sOGfqyTD2IvY9j
-    5vcCkOihGFjiZChRaceNSAqmLkWe+aS/3ZzvjraPPguY5FVk+d6c0J6+zwIDAQAB
-    AoGBAJWVzRpzz9d07ejKfceBaeflavL+Qq9Fkx3bBMAIbTyAH0yfY1XJmahtn1Q6
-    75KqVv1N5FAPUJ8Bc6gyu+aQgU/Gyux/GL2rNTjXMhDtDPJJ/Wm+VetKbVg1aofv
-    W/CfO3aE0ySIMYzex1iFuflxw7Dz6Ydn0YrMUaC6SGG1b3UBAkEA0+bEvYBUpoIr
-    JfVEZKHB0R4BVZF1AmBK1zLD4R6GmHq9L8k3SV1gZwb/JntonNbYDgDkG7HmD7N3
-    fSlf4mnOgQJBALlWBsZETe2oCG67wGC2Lu+Usxfrf6zLK66gbBa2D+hs3rPHiRIm
-    aGztR6KIpxEpPTzQFEnFNQAc25mzEBAvhU8CQALyD0QPF54k6xKhAS1g7j/I6f3V
-    gsngqsmpA/4KHZbbBew3INSdPqzP9RYE2yRq/B/dtU4JQAhx1zRfMd0E2YECQH9c
-    KpOc5KBoVEMkKnNLPr3MxbWuU7J+e6oo+54vxobGKdQJTpx2YFRaSlva5FParwZX
-    R1nady14pz/b2TIGNekCQQDBFq68R5zUeXqMrwpA1MOSDzz711tLZbQvvGXwD/QP
-    Bz0c7sfmywOTnsC85/yw+bHZhk3AlDV3g4XUQvw7YY9L
+    ...
     -----END RSA PRIVATE KEY-----
   jwt-public-key: |
     -----BEGIN PUBLIC KEY-----
     MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCZaPlOjwixunvuQ0GXZfK6p/xp
-    hleijCJKKTNsEYkgpqLA72cVvqSJmQC/oKOAkQbDy9jwy6OtZzHvLRKdCBiGO7Rn
-    yaOScCdho+sOGfqyTD2IvY9j5vcCkOihGFjiZChRaceNSAqmLkWe+aS/3ZzvjraP
-    PguY5FVk+d6c0J6+zwIDAQAB
+    ...
     -----END PUBLIC KEY-----
 
 spring:
+  security:
+    user:
+      name: admin
+      password: admin123
   datasource:
     url: jdbc:postgresql://localhost:5432/lexoramain
     username: postgres
@@ -41,7 +32,23 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
   servlet:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
+
+management:
+  endpoints:
+    web:
+      base-path: /management    # путь для всех эндпоинтов актюатора
+      exposure:
+        include: health,info,metrics,httptrace
+        exclude: beans,env
+  endpoint:
+    health:
+      enabled: true
+    beans:
+      enabled: false
+    info:
+      enabled: true

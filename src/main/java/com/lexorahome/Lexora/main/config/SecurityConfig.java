@@ -29,6 +29,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v3/colors").permitAll()
                         .requestMatchers("/api/v3/goods/**").permitAll()
                         .requestMatchers("/api/v3/lexora-sku-guide").permitAll()
+                        .requestMatchers("/management/**").permitAll()
                         .requestMatchers("/api/v3/skuuudle-report/upload").permitAll()
                         .anyRequest().authenticated()
                 )
