@@ -6,8 +6,8 @@ import org.springframework.security.core.GrantedAuthority;
 
 import java.util.UUID;
 
-@RequiredArgsConstructor
-@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 @Setter
 @Entity
 public class Role implements GrantedAuthority {
@@ -16,7 +16,7 @@ public class Role implements GrantedAuthority {
     private UUID id;
 
     @Column(unique = true,nullable = false)
-    private final String name;
+    private String name;
 
 
     @Override

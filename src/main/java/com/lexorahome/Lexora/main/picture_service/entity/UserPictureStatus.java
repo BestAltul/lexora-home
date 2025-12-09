@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
 
+@Entity
 public class UserPictureStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
