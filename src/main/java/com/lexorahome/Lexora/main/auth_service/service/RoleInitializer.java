@@ -11,14 +11,18 @@ import org.springframework.stereotype.Service;
 public class RoleInitializer {
     private final RoleRepository roleRepository;
 
-    @PostConstruct
-    public void initRoles() {
-        createRoleIfNotExists("ADMIN");
-        createRoleIfNotExists("USER");
-    }
-
-    private void createRoleIfNotExists(String roleName) {
-        roleRepository.findByName(roleName)
-                .orElseGet(() -> roleRepository.save(new Role(roleName)));
-    }
+//    @PostConstruct
+//    public void initRoles() {
+//        createRoleIfNotExists("ADMIN");
+//        createRoleIfNotExists("USER");
+//    }
+//
+//    private void createRoleIfNotExists(String roleName) {
+//        roleRepository.findByName(roleName)
+//                .orElseGet(() -> roleRepository.save(new Role(roleName)));
+//    }
+//    private void createRoleIfNotExists(String roleName) {
+//        roleRepository.findByName(roleName)
+//                .orElseGet(() -> roleRepository.save(new Role(roleName)));
+//    }
 }
