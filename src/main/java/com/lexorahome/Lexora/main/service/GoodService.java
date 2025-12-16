@@ -4,9 +4,11 @@ import com.lexorahome.Lexora.main.entity.*;
 import com.lexorahome.Lexora.main.exception.CoreSkuIsEmptyException;
 import com.lexorahome.Lexora.main.repository.GoodRepository;
 import com.lexorahome.Lexora.main.repository.GoodsCollectionRepository;
+import com.lexorahome.Lexora.main.repository.PriceListRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +25,7 @@ public class GoodService {
     private final ProductTypeService productTypeService;
     private final GoodsCollectionService goodsCollectionService;
     private final RetailService retailService;
+    private final PriceListRepository priceListRepository;
 
     // *****to have the template to map
     // 0 SKU,
@@ -240,4 +243,41 @@ public class GoodService {
         return value == null ? "" : value.trim();
     }
 
+    public Optional<Good> findGoodBySku(String sku){
+        return goodRepository.findBySku(sku);
+    }
+
+    public void savePrice(Good good,String price,String retail){
+
+        PriceList newPriceList = new PriceList();
+        newPriceList.getGood().add(good);
+
+        BigDecimal priceStr = BigDecimal.ZERO;
+        if(price != null && !price.isBlank()){
+            try {
+                priceStr = new BigDecimal(price);
+            } catch (NumberFormatException e) {
+                // log the bad value and set default
+                System.err.println("Invalid price: " + price);
+            }
+        }
+
+
+
+        newPriceList.setPromoMap(priceStr);
+
+//        newPriceList.setPromoMap(new BigDecimal(price));
+
+        GoodsCollection gc = good.getGoodsCollection();
+        if(gc != null){
+            newPriceList.setRetail(retailService.getOrCreateRetail(retail));
+        } else {
+            newPriceList.setRetail(null);
+        }
+
+        //newPriceList.setRetail(good.getGoodsCollection().getRetail());
+
+        priceListRepository.save(newPriceList);
+
+    }
 }

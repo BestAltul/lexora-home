@@ -1,5 +1,6 @@
 package com.lexorahome.Lexora.main.entity;
 
+import com.lexorahome.Lexora.main.exception.GoodNotFoundById;
 import com.lexorahome.Lexora.main.service.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -26,24 +28,37 @@ public class SheetSourceList implements DataSource {
         List<String> mappedLines = new ArrayList<>();
 
         if(retail.equalsIgnoreCase("homedepot.com")){
-           // return  parseHomeDepotCom(filePath);
+            mappedLines = parserService.parseHomeDepotCom(row,"homedepot.com");
         }else if(retail.equalsIgnoreCase("homedepot.ca")){
 
         }else if(retail.equalsIgnoreCase("wayfair.com")){
 
         }else if(retail.equalsIgnoreCase("lowes.com")){
              mappedLines = parserService.parseLowes(row);
-
         }else{
 
         }
 
-        Good good = goodService.createGood(mappedLines);
+        String sku = mappedLines.get(0);
 
-        priceList.getGood().add(good);
+        //  Good good = goodService.createGood(mappedLines);
 
-        Retail cratedRetail = retailService.getOrCreateRetail(retail);
-        priceList.setRetail(cratedRetail);
+        Optional<Good> goodOptional = goodService.findGoodBySku(mappedLines.get(1));
+
+      //  Good good = goodOptional.orElseThrow(()->new GoodNotFoundById("SKU not found "+ sku));
+        if(goodOptional.isPresent()){
+            priceList.getGood().add(goodOptional.get());
+
+            //Retail createdRetail = retailService.getOrCreateRetail(retail);
+            //priceList.setRetail(createdRetail);
+
+            goodService.savePrice(goodOptional.get(), mappedLines.get(9),"Home Depot USA");
+
+        }else{
+            System.out.println("SKU not found "+ sku);
+        }
+
+
 
     }
 

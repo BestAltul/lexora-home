@@ -23,6 +23,7 @@ public class SecurityConfig {
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/api/v3/auth/**").permitAll()
                         .requestMatchers("/api/v3/price-list").permitAll()
+                        .requestMatchers("/api/v3/price-checker").permitAll()
                         .requestMatchers("/api/v3/picture/types").permitAll()
                         .requestMatchers("/api/v3/picture/**").permitAll()
                         .requestMatchers("/api/v3/categories").permitAll()

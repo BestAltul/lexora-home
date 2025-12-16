@@ -37,4 +37,5 @@ public class PriceList {
 
     private BigDecimal promoMap;
     private BigDecimal promoWh;
+
 }

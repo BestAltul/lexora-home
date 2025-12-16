@@ -21,11 +21,13 @@ public class PriceListService {
     private final RetailService retailService;
     private final ParserService parserService;
 
-    public PriceList createPriceList(List<List<String>> data){
+    public void createPriceList(List<List<String>> data){
 
-       PriceList priceList = new PriceList();
+
 
         for(List<String> row : data){
+
+            PriceList priceList = new PriceList();
 
             if(row.get(0).equalsIgnoreCase("SKU") || row.get(0).equalsIgnoreCase("")||row.get(0).equalsIgnoreCase("1.0")){
                 continue;
@@ -37,10 +39,10 @@ public class PriceListService {
 
             DataSourceFactory dataSourceFactory = new DataSourceFactory(goodService,retailService,parserService);
             DataSource dataSource = dataSourceFactory.getSource("sheet");
-            dataSource.parse("lowes.com",row,priceList);
+            dataSource.parse("homedepot.com",row,priceList);
         }
 
-        return priceList;
+       // return priceList;
     }
 
 //    public Map<String,String> getPriceList(String brand){

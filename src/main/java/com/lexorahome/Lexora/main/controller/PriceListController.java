@@ -11,6 +11,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/v3/price-list")
 public class PriceListController {
 
@@ -23,7 +24,7 @@ public class PriceListController {
             return ResponseEntity.badRequest().body("File is not found");
         }
 
-        boolean loaded = priceListService.uploadFiles(file,"Lowes",25);
+        boolean loaded = priceListService.uploadFiles(file,"Homedepot",25);
 
         return ResponseEntity.ok("");
     }

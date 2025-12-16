@@ -14,6 +14,34 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ParserService {
 
+    public List<String> parseHomeDepotCom(List<String> row, String retail){
+        final int IDX_SKU = 0;
+        final int IDX_EXCLUSIVE_SKU = 1;
+        //final int IDX_OLD_SKU = 1;
+        final int IDX_TITLE = 5;
+        final int IDX_COLLECTION = 6;
+        final int IDX_CATEGORY = 3;
+        final int IDX_COLOR = 7;
+        final int IDX_PRODUCT_TYPE = 4;
+        final int IDX_KIT_SINGLE = 10;
+        final int IDX_PROMO_MAP = 22;
+
+        List<String> mappedLines = new ArrayList<>();
+        mappedLines.add(row.get(IDX_SKU));
+        mappedLines.add(row.get(IDX_EXCLUSIVE_SKU));
+        mappedLines.add("");
+        mappedLines.add(row.get(IDX_TITLE));
+        mappedLines.add(row.get(IDX_COLLECTION));
+        mappedLines.add(row.get(IDX_CATEGORY));
+        mappedLines.add(row.get(IDX_COLOR));
+        mappedLines.add(row.get(IDX_PRODUCT_TYPE));
+        mappedLines.add(row.get(IDX_KIT_SINGLE));
+        mappedLines.add(row.get(IDX_PROMO_MAP));
+        mappedLines.add(retail);
+        return mappedLines;
+    }
+
+
     public List<String> parseLowes(List<String> row){
         final int IDX_SKU = 0;
         final int IDX_OLD_SKU = 1;
