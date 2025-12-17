@@ -2,6 +2,7 @@ package com.lexorahome.Lexora.main.repository;
 
 import com.lexorahome.Lexora.main.entity.Good;
 import com.lexorahome.Lexora.main.entity.PriceList;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -23,6 +24,6 @@ AND NOT EXISTS (
 )
 ORDER BY pl.promoMap DESC
 """)
-    List<PriceList> findGoodsWithoutCheckerOrderPromoDesc();
+    List<PriceList> findGoodsWithoutCheckerOrderPromoDesc(Pageable pageable);
 
 }

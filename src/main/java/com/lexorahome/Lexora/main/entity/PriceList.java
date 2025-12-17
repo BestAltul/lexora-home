@@ -38,4 +38,6 @@ public class PriceList {
     private BigDecimal promoMap;
     private BigDecimal promoWh;
 
+    private Boolean onThePlatform;
+
 }

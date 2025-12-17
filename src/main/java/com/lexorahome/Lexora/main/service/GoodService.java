@@ -247,10 +247,14 @@ public class GoodService {
         return goodRepository.findBySku(sku);
     }
 
-    public void savePrice(Good good,String price,String retail){
+    public Optional<Good> findGoodByRetailItemId(String itemId){
+        return goodRepository.findByRetailItemId(itemId);
+    }
 
-        PriceList newPriceList = new PriceList();
-        newPriceList.getGood().add(good);
+    public void savePrice(Good good,String price,String retail, PriceList newPriceList){
+
+//        PriceList newPriceList = new PriceList();
+//        newPriceList.getGood().add(good);
 
         BigDecimal priceStr = BigDecimal.ZERO;
         if(price != null && !price.isBlank()){

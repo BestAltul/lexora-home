@@ -32,5 +32,11 @@ public class RetailPriceListChecker {
     private BigDecimal price_was;
     private BigDecimal price_saving;
     private BigDecimal percentage_off;
+    private String promoText;
 
+    private String rating;
+    private String reviews;
+    private String zipCode;
+    private String stockAvailability;
+    private String deliveryType;
 }

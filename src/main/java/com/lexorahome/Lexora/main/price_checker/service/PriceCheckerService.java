@@ -1,33 +1,55 @@
 package com.lexorahome.Lexora.main.price_checker.service;
 
-import com.lexorahome.Lexora.main.dto.GoodRecord;
 import com.lexorahome.Lexora.main.entity.Good;
 import com.lexorahome.Lexora.main.entity.PriceList;
 import com.lexorahome.Lexora.main.entity.RetailPriceListChecker;
 import com.lexorahome.Lexora.main.price_checker.dto.PriceChecker;
+import com.lexorahome.Lexora.main.price_checker.repository.RetailPriceListCheckerRepository;
 import com.lexorahome.Lexora.main.price_checker.util.PriceCheckerMapper;
 import com.lexorahome.Lexora.main.repository.PriceListRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class PriceCheckerService {
     private final WebClient webClient;
     private final PriceListRepository priceListRepository;
+    private final RetailPriceListCheckerRepository retailPriceListCheckerRepository;
 
-    public void getRestData(String sku){
+    public String getRestData(String sku,String country){
+
+        Map<String, String> parameter = new HashMap<>();
+
+        String delivery_zip = "10010";
 
         String apiKey = "";
         String query = sku;
-        String urlString = "https://serpapi.com/search.json?engine=home_depot&q="
-                + query + "&api_key=" + apiKey;
+//        String urlString = "https://serpapi.com/search.json?engine=home_depot_product&product_id="
+//                + query + delivery_zip + "&api_key=" + apiKey;
+        String urlString =
+                "https://serpapi.com/search.json" +
+                        "?engine=home_depot_product" +
+                        "&product_id=" + sku +
+                        "&delivery_zip=" + delivery_zip +
+                        "&api_key=" + apiKey;
 
         try {
             URL url = new URL(urlString);
@@ -44,34 +66,16 @@ public class PriceCheckerService {
                     content.append(inputLine);
                 }
 
-                in.close();
-                con.disconnect();
 
-              //  System.out.println(content.toString());
-
-                PriceChecker priceChecker = PriceCheckerMapper.mapFromJson(content.toString());
-
-                if (priceChecker.success()) {
-//                    System.out.println("Price: " + priceChecker.price());
-//                    System.out.println("Was: " + priceChecker.price_was());
-//                    System.out.println("Saving: " + priceChecker.price_saving());
-//                    System.out.println("Discount: " + priceChecker.percetnage_off() + "%");
-
-                    RetailPriceListChecker retailPriceListChecker = new RetailPriceListChecker();
-
-
-
-
-                } else {
-                    System.out.println("Failed to extract price info.");
-                }
-
+                return content.toString();
 
             } else {
                 System.out.println("Error: HTTP " + status);
+                return null;
             }
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
     }
 
@@ -79,18 +83,84 @@ public class PriceCheckerService {
 
         //LVD48SA311
         //getRestData("LVD48SA311");
-        for(PriceList priceList: priceListList){
 
-            getRestData(priceList.getSku());
+//        if(!priceListList.isEmpty()){
+//            PriceList firstPriceList = priceListList.get(0);
+//            Set<Good> skuSet = firstPriceList.getGood();
+//
+//            Good firstGood = skuSet.stream().findFirst().orElse(null);
+//            String retailItemId = firstGood.getRetailItemId();
+//            String country = "us";
+//
+//           // String content = getRestData(sku,country);
+//            String content = getRestData(retailItemId,country);
+//
+//            createPriceListChecker(content,firstPriceList);
+//        }
+        String country = "us";
 
+        for (PriceList priceList : priceListList) {
+            Set<Good> skuSet = priceList.getGood();
+
+            if (skuSet == null || skuSet.isEmpty()) {
+                continue;
+            }
+
+            Good firstGood = skuSet.stream().findFirst().orElse(null);
+            if (firstGood == null) {
+                continue;
+            }
+
+            String retailItemId = firstGood.getRetailItemId();
+
+            String content = getRestData(retailItemId, country);
+
+            createPriceListChecker(content, priceList);
         }
 
-      //  return null;
+    }
+    private BigDecimal toBigDecimal(String value) {
+        return value != null ? new BigDecimal(value) : BigDecimal.ZERO;
+    }
+
+
+    public void createPriceListChecker(String content,PriceList priceList){
+
+        PriceChecker priceChecker = PriceCheckerMapper.mapFromJson(content.toString());
+        RetailPriceListChecker retailPriceListChecker = new RetailPriceListChecker();
+
+        if (priceChecker.success()) {
+            retailPriceListChecker.setCompanyPrice(priceList.getPromoMap());
+
+            retailPriceListChecker.setPrice(toBigDecimal(priceChecker.price()));
+            retailPriceListChecker.setPrice_was(toBigDecimal(priceChecker.price_was()));
+            retailPriceListChecker.setPrice_saving(toBigDecimal(priceChecker.price_saving()));
+            retailPriceListChecker.setPercentage_off(toBigDecimal(priceChecker.percetnage_off()));
+            retailPriceListChecker.setRating(priceChecker.rating());
+            retailPriceListChecker.setReviews(priceChecker.reviews());
+            retailPriceListChecker.setPromoText(priceChecker.promoText());
+            retailPriceListChecker.setZipCode(priceChecker.zipCode());
+            retailPriceListChecker.setStockAvailability(priceChecker.stockAvailability());
+            retailPriceListChecker.setDeliveryType(priceChecker.deliveryType());
+
+
+            retailPriceListChecker.setNotFound(false);
+            retailPriceListChecker.setCheckedDate(Instant.now());
+            //retailPriceListChecker.getDeliveryType();
+            retailPriceListChecker.setPriceList(priceList);
+        } else {
+            retailPriceListChecker.setPriceList(priceList);
+            retailPriceListChecker.setNotFound(true);
+        }
+
+        retailPriceListCheckerRepository.save(retailPriceListChecker);
     }
 
     public List<PriceList> getAllGoods(){
 
-        List<PriceList> goodList = priceListRepository.findGoodsWithoutCheckerOrderPromoDesc();
+        Pageable limit100 = PageRequest.of(0, 5);
+
+        List<PriceList> goodList = priceListRepository.findGoodsWithoutCheckerOrderPromoDesc(limit100);
 
         return goodList;
     }

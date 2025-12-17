@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,18 +41,13 @@ public class PriceListService {
 
             DataSourceFactory dataSourceFactory = new DataSourceFactory(goodService,retailService,parserService);
             DataSource dataSource = dataSourceFactory.getSource("sheet");
-            dataSource.parse("homedepot.com",row,priceList);
+          //  dataSource.parse("homedepot.com",row,priceList);
+            dataSource.parse("HD_PRICE_CHANGED",row,priceList);
         }
 
        // return priceList;
     }
 
-//    public Map<String,String> getPriceList(String brand){
-//
-//        // I need more details. Stop for now. The policy of pricing.
-//
-//        return ;
-//    }
 
     public boolean uploadFiles(MultipartFile file,String sheetName,int maxColumns) throws IOException {
 
@@ -85,17 +82,27 @@ public class PriceListService {
 
         switch (cell.getCellType()) {
             case STRING:
-                return cell.getStringCellValue();
+                return cell.getStringCellValue().trim();
             case NUMERIC:
-                return String.valueOf(cell.getNumericCellValue());
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    return new SimpleDateFormat("yyyy-MM-dd").format(cell.getDateCellValue());
+                } else {
+                    double value = cell.getNumericCellValue();
+                    if (value == Math.floor(value)) { // целое число
+                        return String.valueOf((long) value);
+                    } else {
+                        return new DecimalFormat("#.######").format(value);
+                    }
+                }
             case BOOLEAN:
                 return String.valueOf(cell.getBooleanCellValue());
             case FORMULA:
-                return cell.getCellFormula();
+                return cellToString(cell.getCachedFormulaResultType() == CellType.NUMERIC ? cell : cell);
             case BLANK:
-                return "";
             default:
                 return "";
         }
     }
+
+
 }

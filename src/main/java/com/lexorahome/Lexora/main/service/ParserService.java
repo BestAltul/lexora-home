@@ -41,6 +41,18 @@ public class ParserService {
         return mappedLines;
     }
 
+    public List<String> parsePriceChanged(List<String> row, String retail){
+
+        final int IDX_RETAIL_ITEM_ID = 0;
+        final int IDX_PROMO_MAP = 6;
+
+        List<String> mappedLines = new ArrayList<>();
+        mappedLines.add(row.get(IDX_RETAIL_ITEM_ID));
+        mappedLines.add(row.get(IDX_PROMO_MAP));
+        mappedLines.add(retail);
+        return mappedLines;
+    }
+
 
     public List<String> parseLowes(List<String> row){
         final int IDX_SKU = 0;

@@ -25,6 +25,7 @@ public class Good {
     private String title;
     private boolean isCore;
     private String upc;
+    private String retailItemId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="goods_collection_id")

@@ -7,6 +7,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +32,8 @@ public class SheetSourceList implements DataSource {
 
         if(retail.equalsIgnoreCase("homedepot.com")){
             mappedLines = parserService.parseHomeDepotCom(row,"homedepot.com");
+        }else if(retail.equalsIgnoreCase("HD_PRICE_CHANGED")){
+            mappedLines = parserService.parsePriceChanged(row,"homedepot.com");
         }else if(retail.equalsIgnoreCase("homedepot.ca")){
 
         }else if(retail.equalsIgnoreCase("wayfair.com")){
@@ -39,23 +44,25 @@ public class SheetSourceList implements DataSource {
 
         }
 
-        String sku = mappedLines.get(0);
+     //   String sku = mappedLines.get(0);
+        String retail_id = mappedLines.get(0);
 
         //  Good good = goodService.createGood(mappedLines);
 
-        Optional<Good> goodOptional = goodService.findGoodBySku(mappedLines.get(1));
+        //Optional<Good> goodOptional = goodService.findGoodBySku(mappedLines.get(1));
+
+        Optional<Good> goodOptional = goodService.findGoodByRetailItemId(mappedLines.get(0));
 
       //  Good good = goodOptional.orElseThrow(()->new GoodNotFoundById("SKU not found "+ sku));
         if(goodOptional.isPresent()){
             priceList.getGood().add(goodOptional.get());
+            priceList.setStartAt(LocalDate.now());
+            priceList.setRetailItemId(retail_id);
 
-            //Retail createdRetail = retailService.getOrCreateRetail(retail);
-            //priceList.setRetail(createdRetail);
-
-            goodService.savePrice(goodOptional.get(), mappedLines.get(9),"Home Depot USA");
+            goodService.savePrice(goodOptional.get(), mappedLines.get(1),"Home Depot USA",priceList);
 
         }else{
-            System.out.println("SKU not found "+ sku);
+            System.err.println("SKU not found "+ retail_id);
         }
 
 

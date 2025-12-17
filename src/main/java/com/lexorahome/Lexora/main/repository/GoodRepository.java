@@ -14,4 +14,5 @@ public interface GoodRepository extends JpaRepository<Good, UUID> {
     Optional<Good> findBySku(String sku);
     @EntityGraph(attributePaths = {"category","goodsCollection","productType"})
     List<Good> findAll();
+    Optional<Good> findByRetailItemId(String id);
 }

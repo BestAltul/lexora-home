@@ -29,6 +29,18 @@ public class PriceListController {
         return ResponseEntity.ok("");
     }
 
+    @PostMapping("/price-updated")
+    public ResponseEntity<?> createPriceListByPriceChanged(@RequestParam("file")MultipartFile file) throws IOException {
+
+        if(file.isEmpty()){
+            return ResponseEntity.badRequest().body("File is not found");
+        }
+
+        boolean loaded = priceListService.uploadFiles(file,"HD",25);
+
+        return ResponseEntity.ok("");
+    }
+
 
 //    public ResponseEntity<Map<String,String>> getPriceList(@RequestBody String Brand){
 //        priceListService.
