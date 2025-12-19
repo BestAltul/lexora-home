@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://prod-db:5432/lexoramain
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
+  security:
+    user:
+      name: ${ADMIN_USER}
+      password: ${ADMIN_PASSWORD}
+
+app:
+  jwt-secret: ${JWT_SECRET}
+  jwt-private-key: ${JWT_PRIVATE_KEY}
+  jwt-public-key: ${JWT_PUBLIC_KEY}

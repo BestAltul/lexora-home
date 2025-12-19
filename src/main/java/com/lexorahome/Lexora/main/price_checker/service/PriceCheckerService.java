@@ -7,6 +7,7 @@ import com.lexorahome.Lexora.main.price_checker.dto.PriceChecker;
 import com.lexorahome.Lexora.main.price_checker.entity.DeliveryOption;
 import com.lexorahome.Lexora.main.price_checker.repository.RetailPriceListCheckerRepository;
 import com.lexorahome.Lexora.main.price_checker.util.PriceCheckerMapper;
+import com.lexorahome.Lexora.main.price_checker.util.SerpApiConfig;
 import com.lexorahome.Lexora.main.repository.PriceListRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -28,23 +29,17 @@ public class PriceCheckerService {
     private final WebClient webClient;
     private final PriceListRepository priceListRepository;
     private final RetailPriceListCheckerRepository retailPriceListCheckerRepository;
+    private final SerpApiConfig serpApiConfig;
 
     public String getRestData(String sku,String country){
 
         Map<String, String> parameter = new HashMap<>();
 
-        String delivery_zip = "10010";
-
-        String apiKey = "";
-        String query = sku;
-//        String urlString = "https://serpapi.com/search.json?engine=home_depot_product&product_id="
-//                + query + delivery_zip + "&api_key=" + apiKey;
-        String urlString =
-                "https://serpapi.com/search.json" +
-                        "?engine=home_depot_product" +
-                        "&product_id=" + sku +
-                        "&delivery_zip=" + delivery_zip +
-                        "&api_key=" + apiKey;
+        String urlString = serpApiConfig.getBaseUrl() +
+                "?engine=home_depot_product" +
+                "&product_id=" + sku +
+                "&delivery_zip=" + serpApiConfig.getDeliveryZip() +
+                "&api_key=" + serpApiConfig.getApiKey();
 
         try {
             URL url = new URL(urlString);

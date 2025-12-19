@@ -9,11 +9,11 @@ import java.io.IOException;
 @Configuration
 public class PictureStorageFactory {
 
-    @Bean
-    @Profile("dev")
-    public PictureStorage localStorage() throws IOException{
-        return new LocalPictureStorage();
-    }
+//    @Bean
+//    @Profile("dev")
+//    public PictureStorage localStorage() throws IOException{
+//        return new LocalPictureStorage();
+//    }
 
 //    @Bean
 //    @Profile("prod")

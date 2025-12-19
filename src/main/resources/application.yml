@@ -1,29 +1,7 @@
 app:
   reset-password-url: http://localhost:5173/core/reset-password-request
-  jwt-secret: very-long-secret-key-with-32+chars_test
-
-  jwt-private-key: |
-    -----BEGIN RSA PRIVATE KEY-----
-    MIICXQIBAAKBgQCZaPlOjwixunvuQ0GXZfK6p/xphleijCJKKTNsEYkgpqLA72cV
-    ...
-    -----END RSA PRIVATE KEY-----
-  jwt-public-key: |
-    -----BEGIN PUBLIC KEY-----
-    MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCZaPlOjwixunvuQ0GXZfK6p/xp
-    ...
-    -----END PUBLIC KEY-----
 
 spring:
-  security:
-    user:
-      name: admin
-      password: admin123
-  datasource:
-    url: jdbc:postgresql://localhost:5432/lexoramain
-    username: postgres
-    password: postgres
-    driver-class-name: org.postgresql.Driver
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -41,14 +19,7 @@ spring:
 management:
   endpoints:
     web:
-      base-path: /management    # путь для всех эндпоинтов актюатора
+      base-path: /management
       exposure:
         include: health,info,metrics,httptrace
         exclude: beans,env
-  endpoint:
-    health:
-      enabled: true
-    beans:
-      enabled: false
-    info:
-      enabled: true
