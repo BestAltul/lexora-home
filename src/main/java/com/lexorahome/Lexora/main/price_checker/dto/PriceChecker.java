@@ -1,5 +1,7 @@
 package com.lexorahome.Lexora.main.price_checker.dto;
 
+import java.util.List;
+
 public record PriceChecker(String price,
                            String price_was,
                            String price_saving,
@@ -10,5 +12,6 @@ public record PriceChecker(String price,
                            String reviews,
                            String zipCode,
                            String stockAvailability,
-                           String deliveryType) {
+                           String deliveryType,
+                           List<DeliveryOptionRecord> deliveryOptionRecordList) {
 }

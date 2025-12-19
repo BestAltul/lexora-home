@@ -16,14 +16,24 @@ public interface PriceListRepository extends JpaRepository<PriceList, UUID> {
     @Query("""
 SELECT pl
 FROM PriceList pl
-WHERE pl.promoMap IS NOT NULL
-AND NOT EXISTS (
+WHERE NOT EXISTS (
     SELECT 1
     FROM RetailPriceListChecker rplc
     WHERE rplc.priceList = pl
 )
 ORDER BY pl.promoMap DESC
 """)
+
+//    SELECT pl
+//    FROM PriceList pl
+//    WHERE pl.promoMap IS NOT NULL
+//    AND NOT EXISTS (
+//            SELECT 1
+//                    FROM RetailPriceListChecker rplc
+//                    WHERE rplc.priceList = pl
+//    )
+//    ORDER BY pl.promoMap DESC
+//""")
     List<PriceList> findGoodsWithoutCheckerOrderPromoDesc(Pageable pageable);
 
 }

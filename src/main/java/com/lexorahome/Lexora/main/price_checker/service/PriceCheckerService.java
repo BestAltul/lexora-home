@@ -4,6 +4,7 @@ import com.lexorahome.Lexora.main.entity.Good;
 import com.lexorahome.Lexora.main.entity.PriceList;
 import com.lexorahome.Lexora.main.entity.RetailPriceListChecker;
 import com.lexorahome.Lexora.main.price_checker.dto.PriceChecker;
+import com.lexorahome.Lexora.main.price_checker.entity.DeliveryOption;
 import com.lexorahome.Lexora.main.price_checker.repository.RetailPriceListCheckerRepository;
 import com.lexorahome.Lexora.main.price_checker.util.PriceCheckerMapper;
 import com.lexorahome.Lexora.main.repository.PriceListRepository;
@@ -13,19 +14,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -65,7 +60,6 @@ public class PriceCheckerService {
                 while ((inputLine = in.readLine()) != null) {
                     content.append(inputLine);
                 }
-
 
                 return content.toString();
 
@@ -111,7 +105,9 @@ public class PriceCheckerService {
                 continue;
             }
 
-            String retailItemId = firstGood.getRetailItemId();
+//            String retailItemId = firstGood.getRetailItemId();
+            // changed for requesting by retail_item_id rom price_list, not from good
+            String retailItemId = priceList.getRetailItemId();
 
             String content = getRestData(retailItemId, country);
 
@@ -143,6 +139,22 @@ public class PriceCheckerService {
             retailPriceListChecker.setStockAvailability(priceChecker.stockAvailability());
             retailPriceListChecker.setDeliveryType(priceChecker.deliveryType());
 
+            // delivery options
+            List<DeliveryOption> deliveryOptions = priceChecker.deliveryOptionRecordList()
+                    .stream()
+                    .map(record ->{
+                            DeliveryOption option = new DeliveryOption(
+                            record.type(),
+                            record.title(),
+                            record.arrivalTime(),
+                            record.bottom(),
+                            record.quantity());
+                            option.setRetailPriceListChecker(retailPriceListChecker);
+                            return option;
+                    })
+                    .toList();
+
+            retailPriceListChecker.setDeliveryOptionList(deliveryOptions);
 
             retailPriceListChecker.setNotFound(false);
             retailPriceListChecker.setCheckedDate(Instant.now());
@@ -158,7 +170,7 @@ public class PriceCheckerService {
 
     public List<PriceList> getAllGoods(){
 
-        Pageable limit100 = PageRequest.of(0, 5);
+        Pageable limit100 = PageRequest.of(0, 1000);
 
         List<PriceList> goodList = priceListRepository.findGoodsWithoutCheckerOrderPromoDesc(limit100);
 

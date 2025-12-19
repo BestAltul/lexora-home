@@ -41,6 +41,29 @@ public class PriceListController {
         return ResponseEntity.ok("");
     }
 
+    @PostMapping("/price-updated-difference")
+    public ResponseEntity<?> createPriceListByPriceChanged() throws IOException {
+
+
+        boolean loaded = priceListService.updateDifference();
+
+        return ResponseEntity.ok("");
+    }
+
+
+    @PostMapping("/price-updated-extra")
+    public ResponseEntity<?> createPriceListByExtraFile(@RequestParam("file")MultipartFile file) throws IOException {
+
+        if(file.isEmpty()){
+            return ResponseEntity.badRequest().body("File is not found");
+        }
+
+        boolean loaded = priceListService.updateExtraFile(file,"Sheet1",6);
+
+        return ResponseEntity.ok("");
+    }
+
+
 
 //    public ResponseEntity<Map<String,String>> getPriceList(@RequestBody String Brand){
 //        priceListService.

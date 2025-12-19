@@ -1,5 +1,6 @@
 package com.lexorahome.Lexora.main.entity;
 
+import com.lexorahome.Lexora.main.price_checker.entity.DeliveryOption;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -23,6 +25,10 @@ public class RetailPriceListChecker {
 
     @OneToOne
     private Retail retail;
+
+    @OneToMany(mappedBy = "retailPriceListChecker",cascade = CascadeType.ALL)
+    private List<DeliveryOption> deliveryOptionList;
+
     private Instant checkedDate;
     private Boolean notFound;
 
@@ -39,4 +45,5 @@ public class RetailPriceListChecker {
     private String zipCode;
     private String stockAvailability;
     private String deliveryType;
+
 }

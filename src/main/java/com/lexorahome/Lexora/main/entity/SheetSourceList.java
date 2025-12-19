@@ -34,6 +34,12 @@ public class SheetSourceList implements DataSource {
             mappedLines = parserService.parseHomeDepotCom(row,"homedepot.com");
         }else if(retail.equalsIgnoreCase("HD_PRICE_CHANGED")){
             mappedLines = parserService.parsePriceChanged(row,"homedepot.com");
+        }else if(retail.equalsIgnoreCase("EXTRA_FILE")){
+
+            mappedLines = parserService.parseExtra(row,"homedepot.com");
+
+            createPriceListByExtraFile(row,mappedLines,priceList);
+
         }else if(retail.equalsIgnoreCase("homedepot.ca")){
 
         }else if(retail.equalsIgnoreCase("wayfair.com")){
@@ -45,29 +51,50 @@ public class SheetSourceList implements DataSource {
         }
 
      //   String sku = mappedLines.get(0);
-        String retail_id = mappedLines.get(0);
-
-        //  Good good = goodService.createGood(mappedLines);
-
-        //Optional<Good> goodOptional = goodService.findGoodBySku(mappedLines.get(1));
-
-        Optional<Good> goodOptional = goodService.findGoodByRetailItemId(mappedLines.get(0));
-
-      //  Good good = goodOptional.orElseThrow(()->new GoodNotFoundById("SKU not found "+ sku));
-        if(goodOptional.isPresent()){
-            priceList.getGood().add(goodOptional.get());
-            priceList.setStartAt(LocalDate.now());
-            priceList.setRetailItemId(retail_id);
-
-            goodService.savePrice(goodOptional.get(), mappedLines.get(1),"Home Depot USA",priceList);
-
-        }else{
-            System.err.println("SKU not found "+ retail_id);
-        }
-
+//        String retail_id = mappedLines.get(0);
+//
+//        //  Good good = goodService.createGood(mappedLines);
+//
+//        //Optional<Good> goodOptional = goodService.findGoodBySku(mappedLines.get(1));
+//
+//        Optional<Good> goodOptional = goodService.findGoodByRetailItemId(mappedLines.get(0));
+//
+//      //  Good good = goodOptional.orElseThrow(()->new GoodNotFoundById("SKU not found "+ sku));
+//
+//
+//        if(goodOptional.isPresent()){
+//            priceList.getGood().add(goodOptional.get());
+//            priceList.setStartAt(LocalDate.now());
+//            priceList.setRetailItemId(retail_id);
+//
+//            goodService.savePrice(goodOptional.get(), mappedLines.get(1),"Home Depot USA",priceList);
+//
+//        }else{
+//            System.err.println("SKU not found "+ retail_id);
+//        }
+//
 
 
     }
+
+    public void createPriceListByExtraFile(List<String> row, List<String> mappedLines, PriceList priceList){
+
+        Optional<Good> goodOptional = goodService.findGoodBySku(mappedLines.get(0));
+
+        if(goodOptional.isPresent()) {
+            Good good = goodOptional.get();
+
+            priceList.getGood().add(good);
+            priceList.setStartAt(LocalDate.now());
+            priceList.setRetailItemId(row.get(4));
+
+            goodService.savePrice(good, mappedLines.get(3), "Home Depot USA", priceList);
+
+        } else {
+            System.err.println("SKU not found: " + mappedLines.get(0));
+        }
+    }
+
 
     public List<String> parseLexoraSkuGuide(List<String> row){
 

@@ -251,6 +251,11 @@ public class GoodService {
         return goodRepository.findByRetailItemId(itemId);
     }
 
+    public List<Good> findDifference(String retail){
+        return goodRepository.findGoodsNotInAnyPricelistByRetail(retail);
+    }
+
+
     public void savePrice(Good good,String price,String retail, PriceList newPriceList){
 
 //        PriceList newPriceList = new PriceList();

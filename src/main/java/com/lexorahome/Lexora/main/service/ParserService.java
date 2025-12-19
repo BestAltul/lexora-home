@@ -53,6 +53,22 @@ public class ParserService {
         return mappedLines;
     }
 
+    public List<String> parseExtra(List<String> row, String retail){
+
+        final int IDX_SKU = 0;
+        final int IDX_TITLE = 1;
+        final int IDX_RETAIL_ITEM_ID = 4;
+        final int IDX_PROMO_MAP = 5;
+
+        List<String> mappedLines = new ArrayList<>();
+        mappedLines.add(row.get(IDX_SKU));
+        mappedLines.add(row.get(IDX_TITLE));
+        mappedLines.add(row.get(IDX_RETAIL_ITEM_ID));
+        mappedLines.add(row.get(IDX_PROMO_MAP));
+        mappedLines.add(retail);
+        return mappedLines;
+    }
+
 
     public List<String> parseLowes(List<String> row){
         final int IDX_SKU = 0;
